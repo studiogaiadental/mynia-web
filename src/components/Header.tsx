@@ -4,9 +4,9 @@ const logo = '/assets/logo.png'
 type NavItem = { label: string; hasCaret?: boolean; active?: boolean }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Home' },
+  { label: 'Home', active: true },
   { label: 'Foundation', hasCaret: true },
-  { label: 'Genia Day', hasCaret: true, active: true },
+  { label: 'Genia Day', hasCaret: true },
   { label: 'Updates', hasCaret: true },
   { label: 'Contact Us' },
 ]
@@ -14,7 +14,7 @@ const NAV_ITEMS: NavItem[] = [
 export default function Header() {
   return (
     <header className="site-header">
-      <div className="site-header__inner">
+      <div className="site-header__inner" data-aos="fade-down">
         <a className="site-header__logo" href="#">
           <img src={logo} alt="GMedCC" />
         </a>

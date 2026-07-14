@@ -46,8 +46,8 @@ export default function HealthStory() {
   return (
     <>
       <section className="health-story">
-        <h2 className="health-story__title">Your Health Story, All in One Place</h2>
-        <div className="health-story__tabs" role="tablist" aria-label="MyNia features">
+        <h2 className="health-story__title" data-aos="fade-up">Your Health Story, All in One Place</h2>
+        <div className="health-story__tabs" role="tablist" aria-label="MyNia features" data-aos="fade-up" data-aos-delay="100">
           {TABS.map((tab, index) => (
             <button
               key={tab.label}
@@ -72,11 +72,11 @@ export default function HealthStory() {
         aria-labelledby={`health-story-tab-${activeIndex}`}
       >
         <div className="monitor__inner" key={activeTab.label}>
-          <div className="monitor__visual">
+          <div className="monitor__visual" data-aos="fade-right">
             <span className="monitor__halo" aria-hidden="true" />
             <img className="monitor__phone" src={activeTab.phone} alt={activeTab.phoneAlt} />
           </div>
-          <div className="monitor__content">
+          <div className="monitor__content" data-aos="fade-left">
             <h2 className="monitor__title">{activeTab.title}</h2>
             <p className="monitor__text">{activeTab.text}</p>
           </div>
