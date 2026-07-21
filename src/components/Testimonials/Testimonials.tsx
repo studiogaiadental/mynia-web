@@ -1,3 +1,5 @@
+import './Testimonials.css'
+
 const quote = '/assets/quote.svg'
 const avatar = '/assets/avatar.jpg'
 
@@ -49,15 +51,15 @@ const TESTIMONIALS: Testimonial[] = [
 export default function Testimonials() {
   return (
     <section className="testimonials">
-      <div className="testimonials__header">
+      <div className="testimonials__header" data-aos="fade-up">
         <p className="testimonials__eyebrow">Testimonials</p>
         <h2 className="testimonials__title">Every health journey starts with a single step.</h2>
         <p className="testimonials__subtitle">This is what they say</p>
       </div>
 
       <div className="testimonials__grid">
-        {TESTIMONIALS.map((item) => (
-          <article className="testimonial-card" key={item.name}>
+        {TESTIMONIALS.map((item, index) => (
+          <article className="testimonial-card" key={item.name} data-aos="fade-up" data-aos-delay={index * 100}>
             <img className="testimonial-card__quote" src={quote} alt="" aria-hidden="true" />
             <p className="testimonial-card__text">&ldquo;{item.quote}&rdquo;</p>
             <footer className="testimonial-card__author">
