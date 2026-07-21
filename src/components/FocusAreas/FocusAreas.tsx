@@ -1,3 +1,5 @@
+import './FocusAreas.css'
+
 const iconHeart = '/assets/icon-heart.svg'
 const iconDiabetes = '/assets/icon-diabetes.svg'
 const iconMaternal = '/assets/icon-maternal.svg'

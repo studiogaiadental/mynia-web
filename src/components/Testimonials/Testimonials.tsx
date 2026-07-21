@@ -1,3 +1,5 @@
+import './Testimonials.css'
+
 const quote = '/assets/quote.svg'
 const avatar = '/assets/avatar.jpg'
 

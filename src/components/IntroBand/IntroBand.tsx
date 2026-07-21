@@ -1,3 +1,5 @@
+import './IntroBand.css'
+
 export default function IntroBand() {
   return (
     <section className="intro-band">

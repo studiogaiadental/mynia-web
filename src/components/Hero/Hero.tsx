@@ -1,3 +1,5 @@
+import './Hero.css'
+
 const heroPhones = '/assets/hero-phones.png'
 const swoosh = '/assets/swoosh.png'
 const googlePlay = '/assets/google-play.png'

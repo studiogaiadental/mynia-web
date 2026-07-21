@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import './HealthStory.css'
 
 type Tab = {
   label: string

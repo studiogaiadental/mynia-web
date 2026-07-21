@@ -1,0 +1,216 @@
+.health-story {
+  background: var(--brand-white);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  padding: 140px 24px 40px;
+  text-align: center;
+}
+
+.health-story__title {
+  margin: 0 0 40px;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 28px;
+  line-height: 1.167;
+  color: var(--brand-neutral-dark);
+}
+
+.health-story__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+}
+
+.tab-pill {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1.25;
+  color: var(--md-grey);
+  background: transparent;
+  border: 1.5px solid #d1d5db;
+  border-radius: 40px;
+  padding: 12px 24px;
+  transition: all 0.3s ease;
+}
+
+.tab-pill:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+  color: var(--brand-neutral-dark);
+}
+
+.tab-pill--active {
+  font-weight: 600;
+  color: var(--brand-neutral-dark);
+  background: var(--brand-white);
+  border-color: var(--brand-neutral-dark);
+  box-shadow: none;
+  pointer-events: none; /* disables hover state when active */
+}
+
+/* ============================================================= Monitor */
+.monitor {
+  background: var(--brand-white);
+  overflow: hidden;
+}
+
+.monitor__inner {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 60px 64px;
+  min-height: 560px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  animation: monitor-fade-in 0.35s ease;
+}
+
+@keyframes monitor-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.monitor__visual {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 340px;
+  max-width: 100%;
+}
+
+.monitor__halo {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(175, 218, 219, 0.55) 0%,
+    rgba(175, 218, 219, 0) 70%
+  );
+  z-index: 0;
+}
+
+.monitor__phone {
+  position: relative;
+  z-index: 1;
+  width: 265px;
+  height: auto;
+  object-fit: cover;
+  border-radius: 40px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+.monitor__content {
+  flex: 0 1 492px;
+  max-width: 492px;
+}
+
+.monitor__title {
+  margin: 0 0 12px;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 37px;
+  line-height: 1.167;
+  color: var(--brand-primary);
+}
+
+.monitor__text {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 1.4;
+  color: var(--brand-neutral-dark);
+}
+
+@media (max-width: 1100px) {
+  .health-story {
+    padding: 96px 24px 40px;
+  }
+
+  .monitor__inner {
+    flex-direction: column;
+    text-align: center;
+    min-height: auto;
+    padding: 48px 40px;
+  }
+
+  .monitor__content {
+    flex: none;
+    width: 100%;
+    max-width: 520px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 720px) {
+  .health-story {
+    padding: 64px 24px 32px;
+  }
+
+  .monitor__inner {
+    padding: 40px 24px;
+    gap: 32px;
+  }
+
+  .monitor__title {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .health-story {
+    padding: 40px 20px 24px;
+  }
+
+  .health-story__title {
+    font-size: 22px;
+    margin-bottom: 28px;
+  }
+
+  .health-story__tabs {
+    gap: 10px;
+  }
+
+  .tab-pill {
+    font-size: 13px;
+    padding: 9px 16px;
+  }
+
+  .monitor__inner {
+    padding: 32px 20px;
+    gap: 24px;
+  }
+
+  .monitor__visual {
+    width: 220px;
+  }
+
+  .monitor__halo {
+    width: 220px;
+    height: 220px;
+  }
+
+  .monitor__phone {
+    width: 180px;
+    border-radius: 28px;
+  }
+
+  .monitor__title {
+    font-size: 22px;
+  }
+
+  .monitor__text {
+    font-size: 16px;
+  }
+}
