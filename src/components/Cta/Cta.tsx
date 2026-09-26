@@ -1,4 +1,5 @@
 import ArrowButton from '../ui/ArrowButton'
+import { APK_DOWNLOAD_URL } from '../../lib/api'
 import './Cta.css'
 
 const phones = '/assets/cta/cta-phones.jpg'
@@ -15,7 +16,7 @@ export default function Cta() {
               supportive community to help you thrive. Let&rsquo;s step towards a healthier you!
             </p>
           </div>
-          <ArrowButton>Download Now</ArrowButton>
+          <ArrowButton href={APK_DOWNLOAD_URL}>Download Now</ArrowButton>
         </div>
         {/* Desktop shows the phones as part of the background image; smaller screens stack this crop under the text */}
         <img
