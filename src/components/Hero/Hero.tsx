@@ -1,35 +1,41 @@
+import ArrowButton from '../ui/ArrowButton'
 import './Hero.css'
 
-const heroPhones = '/assets/hero-phones.png'
-const swoosh = '/assets/swoosh.png'
-const googlePlay = '/assets/google-play.png'
-const floatHeart = '/assets/float-heart.svg'
-const floatPlus = '/assets/float-plus.svg'
-const floatShield = '/assets/float-shield.svg'
+const bgPhoto = '/assets/hero/hero-bg-photo.jpg'
+const circles = '/assets/hero/hero-circles.svg'
+const phones = '/assets/hero/hero-phones.png'
+const eyebrowDot = '/assets/hero/eyebrow-dot.svg'
 
 export default function Hero() {
   return (
     <section className="hero">
-      <img className="hero__swoosh" src={swoosh} alt="" aria-hidden="true" />
-
+      <div
+        className="hero__bg"
+        style={{ backgroundImage: `url(${bgPhoto})` }}
+        aria-hidden="true"
+      />
       <div className="hero__inner">
-        <div className="hero__visual" data-aos="fade-left" data-aos-delay="200">
-          <div className="hero__circle" aria-hidden="true" />
-          <img className="hero__phones" src={heroPhones} alt="MyNia Health App on smartphones" />
-          <img className="hero__float hero__float--plus" src={floatPlus} alt="" aria-hidden="true" />
-          <img className="hero__float hero__float--heart" src={floatHeart} alt="" aria-hidden="true" />
-          <img className="hero__float hero__float--shield" src={floatShield} alt="" aria-hidden="true" />
-        </div>
-
         <div className="hero__content" data-aos="fade-right">
-          <h1 className="hero__title">Meet MyNia<br />Health App</h1>
-          <p className="hero__description">
-            A smarter way to understand, monitor, and manage your health every day.
-          </p>
-          <p className="hero__subtitle">Available on Android</p>
-          <a className="hero__store" href="#" aria-label="Get it on Google Play">
-            <img src={googlePlay} alt="Get it on Google Play" />
-          </a>
+          <div className="hero__text">
+            <p className="hero__eyebrow">
+              <img src={eyebrowDot} alt="" aria-hidden="true" />
+              <span>Our Ecosystem</span>
+            </p>
+            <h1 className="hero__title">Let&rsquo;s Meet MyNia Health App</h1>
+            <p className="hero__description">
+              A patient-centric digital ecosystem designed to integrate medical devices, AI
+              diagnostics, telehealth, treatment planning, and health management tools into one{' '}
+              <br className="hero__break" />
+              seamless experience.
+            </p>
+          </div>
+          <ArrowButton>Download Now</ArrowButton>
+        </div>
+        <div className="hero__visual" data-aos="fade-left" data-aos-delay="200">
+          <img className="hero__circles" src={circles} alt="" aria-hidden="true" />
+          <div className="hero__phones">
+            <img src={phones} alt="MyNia Health App home and measurement screens" />
+          </div>
         </div>
       </div>
     </section>

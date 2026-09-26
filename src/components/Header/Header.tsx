@@ -4,14 +4,23 @@ import './Header.css'
 const arrowDown = '/assets/arrow-down.svg'
 const logo = '/assets/logo.png'
 
-type NavItem = { label: string; hasCaret?: boolean; active?: boolean }
+type NavItem = { label: string; href: string; hasCaret?: boolean; active?: boolean }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Home', active: true },
-  { label: 'Foundation', hasCaret: true },
-  { label: 'Genia Day', hasCaret: true },
-  { label: 'Updates', hasCaret: true },
-  { label: 'Contact Us' },
+  { label: 'Home', href: 'https://www.gmedcc.com/' },
+  {
+    label: 'Foundation',
+    href: 'https://www.gmedcc.com/get-involved/genia-day/genia-day-gmedcc-doctorshare?tab=individual',
+    hasCaret: true,
+  },
+  {
+    label: 'Genia Day',
+    href: 'https://www.gmedcc.com/get-involved/genia-day',
+    hasCaret: true,
+    active: true,
+  },
+  { label: 'Updates', href: 'https://www.gmedcc.com/updates/insights', hasCaret: true },
+  { label: 'Contact Us', href: 'https://www.gmedcc.com/contact-us' },
 ]
 
 export default function Header() {
@@ -58,7 +67,7 @@ export default function Header() {
           {NAV_ITEMS.map((item) => (
             <a
               key={item.label}
-              href="#"
+              href={item.href}
               className={`nav-link${item.active ? ' nav-link--active' : ''}`}
               onClick={() => setIsMenuOpen(false)}
             >
