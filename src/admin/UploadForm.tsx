@@ -1,5 +1,11 @@
 import { useRef, useState, type ChangeEvent, type FormEvent } from 'react'
-import { UploadCancelledError, uploadApk, type Apk, type UploadHandle } from './api'
+import {
+  UploadCancelledError,
+  uploadApk,
+  type Apk,
+  type ApkUploadDetails,
+  type UploadHandle,
+} from './api'
 import { formatBytes } from './format'
 
 type UploadFormProps = {
@@ -35,11 +41,20 @@ export default function UploadForm({ token, onUploaded, onError }: UploadFormPro
     event.preventDefault()
     if (!file) return
     const form = event.currentTarget
-    // file, versionName, versionCode, releaseNotes and, when ticked, activate=on
-    const data = new FormData(form)
+    // Read before the fields are disabled: FormData skips disabled inputs.
+    const fields = new FormData(form)
+    const versionCode = String(fields.get('versionCode') ?? '').trim()
+    const details: ApkUploadDetails = {
+      versionName: String(fields.get('versionName') ?? '').trim(),
+      versionCode: versionCode === '' ? null : Number(versionCode),
+      releaseNotes: String(fields.get('releaseNotes') ?? '').trim(),
+      activate: fields.get('activate') === 'on',
+    }
 
     setProgress({ loaded: 0, total: file.size })
-    const upload = uploadApk(token, data, (loaded, total) => setProgress({ loaded, total }))
+    const upload = uploadApk(token, file, details, (loaded, total) =>
+      setProgress({ loaded, total }),
+    )
     uploadRef.current = upload
     try {
       const apk = await upload.promise
@@ -139,13 +154,16 @@ export default function UploadForm({ token, onUploaded, onError }: UploadFormPro
                   ? `Uploading… ${percent}% · ${formatBytes(progress.loaded)} of ${formatBytes(progress.total)}`
                   : 'Processing on the server…'}
               </span>
-              <button
-                type="button"
-                className="admin-button admin-button--secondary"
-                onClick={() => uploadRef.current?.abort()}
-              >
-                Cancel
-              </button>
+              {/* Gone once every byte is sent: the server is already turning it into an APK. */}
+              {percent < 100 && (
+                <button
+                  type="button"
+                  className="admin-button admin-button--secondary"
+                  onClick={() => uploadRef.current?.abort()}
+                >
+                  Cancel
+                </button>
+              )}
             </div>
           </div>
         ) : (
