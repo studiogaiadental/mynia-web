@@ -6,10 +6,20 @@
   --brand-neutral-light: #f5f5f5;
   --brand-white: #ffffff;
   --md-grey: #6c6c6c;
-  --hero-gradient-bottom: #afdadb;
+  --brand-secondary: #afdadb;
+  --hero-gradient-bottom: var(--brand-secondary);
+  --accent-apple: #a1ce70;
+  --neutral-5: #dddddd;
+  --neutral-9: #5b5b5b;
+  --grey: #9c9c9c;
+  --gray-subhead: #75798a;
+  --btn-dark: #111313;
   --card-border: #e2e8f0;
 
   --round-md: 23px;
+  --round-lg: 24px;
+
+  --section-pad-x: 100px;
 
   --font-heading: 'Poppins', system-ui, sans-serif;
   --font-body: 'Public Sans', system-ui, sans-serif;

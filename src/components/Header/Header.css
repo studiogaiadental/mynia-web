@@ -15,20 +15,19 @@
   width: 100%;
   max-width: var(--page-max);
   margin: 0 auto;
-  padding: 0 64px;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  padding: 0 131px;
+  display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 138px;
 }
 
 .site-header__logo {
-  justify-self: flex-start;
+  flex-shrink: 0;
   min-width: 0;
 }
 
 .site-header__logo img {
-  height: 46px;
+  height: 60px;
   width: auto;
   max-width: 100%;
 }
@@ -38,7 +37,7 @@
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 28px;
+  gap: 29px;
   min-width: 0;
 }
 
@@ -69,12 +68,11 @@
 
 .nav-link--active {
   font-weight: 600;
-  color: var(--brand-primary);
 }
 
 .nav-link__caret {
-  width: 18px;
-  height: 18px;
+  width: 33px;
+  height: 33px;
   transition: transform 0.3s ease;
 }
 
@@ -135,11 +133,23 @@
   z-index: 15;
 }
 
+@media (max-width: 1279px) {
+  .site-header__inner {
+    padding: 0 64px;
+    justify-content: space-between;
+    gap: 24px;
+  }
+}
+
 /* Tablet: keep the horizontal nav, just tighten it up so it never wraps */
 @media (max-width: 1023px) and (min-width: 768px) {
   .site-header__inner {
     padding: 0 32px;
     gap: 16px;
+  }
+
+  .site-header__logo img {
+    height: 48px;
   }
 
   .site-header__nav {
@@ -152,8 +162,8 @@
   }
 
   .nav-link__caret {
-    width: 15px;
-    height: 15px;
+    width: 24px;
+    height: 24px;
   }
 }
 
@@ -218,6 +228,7 @@
   }
 
   .nav-link--active {
+    color: var(--brand-primary);
     background: rgba(19, 84, 139, 0.1);
     box-shadow: inset 3px 0 0 var(--brand-primary);
   }
@@ -229,6 +240,8 @@
   }
 
   .nav-link__caret {
+    width: 24px;
+    height: 24px;
     opacity: 0.55;
   }
 

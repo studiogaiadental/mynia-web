@@ -1,0 +1,127 @@
+/*
+ * Desktop: cta-bg.jpg is the Figma CTA (light-tosca waves masked to fade out on the left,
+ * with the two iPhone 16 mockups), taken from the design render. It is 1440 × 534 at 1x;
+ * its left edge is pure white, so the white background continues it on wider screens.
+ */
+.cta {
+  position: relative;
+  overflow: hidden;
+  background: var(--brand-white) url('/assets/cta/cta-bg.jpg') right top / auto 100% no-repeat;
+}
+
+.cta__inner {
+  position: relative;
+  max-width: var(--page-max);
+  min-height: 534px;
+  margin: 0 auto;
+  padding: 24px var(--section-pad-x);
+  display: flex;
+  align-items: center;
+}
+
+.cta__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 48px;
+  /* keep clear of the phones, which start ~800px from the right edge */
+  max-width: min(619px, calc(100vw - 800px));
+}
+
+.cta__text {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.cta__title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 48px;
+  line-height: 1.167;
+  letter-spacing: 1px;
+  color: var(--brand-primary);
+}
+
+.cta__description {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 28px;
+  color: #000;
+}
+
+.cta__phones {
+  display: none;
+}
+
+/* ------------------------------------------------------------ Responsive */
+@media (max-width: 1279px) {
+  .cta {
+    background: linear-gradient(180deg, #ffffff 0%, #f1f8f8 55%, #dcecec 100%);
+  }
+
+  .cta__inner {
+    min-height: 0;
+    padding: 72px 64px 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .cta__content {
+    max-width: 640px;
+    align-items: center;
+    text-align: center;
+    gap: 36px;
+  }
+
+  .cta__title {
+    font-size: 40px;
+  }
+
+  .cta__description {
+    font-size: 19px;
+    line-height: 1.45;
+  }
+
+  .cta__phones {
+    display: block;
+    width: min(700px, 100%);
+    height: auto;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 88%, transparent 100%),
+      linear-gradient(180deg, transparent 0%, #000 20%);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(90deg, transparent 0%, #000 14%, #000 88%, transparent 100%),
+      linear-gradient(180deg, transparent 0%, #000 20%);
+    mask-composite: intersect;
+  }
+}
+
+@media (max-width: 1023px) {
+  .cta__inner {
+    padding: 64px 40px 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .cta__inner {
+    padding: 56px 24px 0;
+    gap: 28px;
+  }
+
+  .cta__content {
+    gap: 28px;
+  }
+
+  .cta__title {
+    font-size: 30px;
+  }
+
+  .cta__description {
+    font-size: 17px;
+  }
+}

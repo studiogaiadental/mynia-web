@@ -1,0 +1,261 @@
+.features {
+  background: var(--brand-white);
+}
+
+.features__inner {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 78px var(--section-pad-x);
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+}
+
+.features__title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 40px;
+  line-height: 48px;
+  text-align: center;
+  color: var(--brand-primary);
+}
+
+/* 5 × 2 grid inside a rounded border; dividers are inset 20px like the Figma frame */
+.features__grid {
+  --cols: 5;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  column-gap: 48.5px;
+  row-gap: 32.5px;
+  margin: 0;
+  padding: 0 20px;
+  list-style: none;
+  border: 0.5px solid var(--neutral-5);
+  border-radius: var(--round-lg);
+  background: var(--brand-white);
+}
+
+.feature-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 20px 0;
+}
+
+/* vertical divider */
+.feature-item::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  bottom: 20px;
+  left: -24.25px;
+  width: 0.5px;
+  background: var(--neutral-5);
+}
+
+/* horizontal divider between rows */
+.feature-item::after {
+  content: '';
+  position: absolute;
+  top: -16.25px;
+  left: -24.25px;
+  right: -24.25px;
+  height: 0.5px;
+  background: var(--neutral-5);
+}
+
+.feature-item:nth-child(5n + 1)::before {
+  display: none;
+}
+
+.feature-item:nth-child(-n + 5)::after {
+  display: none;
+}
+
+.feature-item:nth-child(5n + 1)::after {
+  left: 0;
+}
+
+.feature-item:nth-child(5n)::after {
+  right: 0;
+}
+
+.feature-item__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #f1fafb;
+}
+
+.feature-item__icon img {
+  width: 28px;
+  height: 28px;
+}
+
+.feature-item__body {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.feature-item__title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 30px;
+  color: #000;
+}
+
+.feature-item__text {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 16px;
+  color: var(--gray-subhead);
+}
+
+/* ------------------------------------------------------------ Responsive */
+@media (max-width: 1279px) {
+  .features__inner {
+    padding: 72px 64px;
+  }
+
+  .features__grid {
+    column-gap: 32px;
+  }
+
+  .feature-item::before {
+    left: -16.25px;
+  }
+
+  .feature-item::after {
+    left: -16.25px;
+    right: -16.25px;
+  }
+
+  .feature-item:nth-child(5n + 1)::after {
+    left: 0;
+  }
+
+  .feature-item:nth-child(5n)::after {
+    right: 0;
+  }
+
+  .feature-item__title {
+    font-size: 18px;
+  }
+}
+
+/* 3 and 2 columns: reset the 5-column divider rules, then re-apply per column count */
+@media (max-width: 1023px) {
+  .features__inner {
+    padding: 64px 40px;
+    gap: 40px;
+  }
+
+  .features__grid {
+    --cols: 3;
+  }
+
+  .feature-item:nth-child(n)::before,
+  .feature-item:nth-child(n)::after {
+    display: block;
+  }
+
+  .feature-item:nth-child(n)::after {
+    left: -16.25px;
+    right: -16.25px;
+  }
+
+  .feature-item:nth-child(3n + 1)::before,
+  .feature-item:nth-child(-n + 3)::after {
+    display: none;
+  }
+
+  .feature-item:nth-child(3n + 1)::after {
+    left: 0;
+  }
+
+  .feature-item:nth-child(3n)::after {
+    right: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .features__inner {
+    padding: 56px 24px;
+    gap: 32px;
+  }
+
+  .features__title {
+    font-size: 30px;
+    line-height: 1.25;
+  }
+
+  .features__grid {
+    --cols: 2;
+    column-gap: 24px;
+    row-gap: 24px;
+    padding: 0 16px;
+  }
+
+  .feature-item {
+    gap: 16px;
+    padding: 16px 0;
+  }
+
+  .feature-item:nth-child(n)::before,
+  .feature-item:nth-child(n)::after {
+    display: block;
+  }
+
+  .feature-item:nth-child(n)::before {
+    left: -12.25px;
+    top: 16px;
+    bottom: 16px;
+  }
+
+  .feature-item:nth-child(n)::after {
+    top: -12.25px;
+    left: -12.25px;
+    right: -12.25px;
+  }
+
+  .feature-item:nth-child(2n + 1)::before,
+  .feature-item:nth-child(-n + 2)::after {
+    display: none;
+  }
+
+  .feature-item:nth-child(2n + 1)::after {
+    left: 0;
+  }
+
+  .feature-item:nth-child(2n)::after {
+    right: 0;
+  }
+
+  .feature-item__icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .feature-item__icon img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .feature-item__title {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .feature-item__text {
+    font-size: 13px;
+  }
+}

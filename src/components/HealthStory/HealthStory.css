@@ -1,216 +1,371 @@
 .health-story {
   background: var(--brand-white);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
-  padding: 140px 24px 40px;
-  text-align: center;
+}
+
+.health-story__inner {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 78px var(--section-pad-x);
+  display: flex;
+  align-items: center;
+  gap: 36px;
+}
+
+.health-story__intro {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+}
+
+.health-story__header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .health-story__title {
-  margin: 0 0 40px;
+  margin: 0;
   font-family: var(--font-heading);
-  font-weight: 500;
-  font-size: 28px;
-  line-height: 1.167;
+  font-weight: 600;
+  font-size: 40px;
+  line-height: 48px;
+  color: var(--brand-primary);
+}
+
+.health-story__subtitle {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 22px;
+  line-height: normal;
   color: var(--brand-neutral-dark);
 }
 
+/* ------------------------------------------------------------ Tabs */
 .health-story__tabs {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 24px;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.tab-pill {
-  font-family: var(--font-heading);
-  font-weight: 500;
-  font-size: 15px;
-  line-height: 1.25;
-  color: var(--md-grey);
+.story-tab {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  width: 100%;
+  padding: 24px;
+  border: none;
+  border-radius: 12px;
   background: transparent;
-  border: 1.5px solid #d1d5db;
-  border-radius: 40px;
-  padding: 12px 24px;
-  transition: all 0.3s ease;
+  text-align: left;
+  transition: background-color 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.tab-pill:hover {
-  background: #f3f4f6;
-  border-color: #9ca3af;
-  color: var(--brand-neutral-dark);
+.story-tab:hover {
+  background: rgba(175, 218, 219, 0.06);
 }
 
-.tab-pill--active {
-  font-weight: 600;
-  color: var(--brand-neutral-dark);
-  background: var(--brand-white);
-  border-color: var(--brand-neutral-dark);
-  box-shadow: none;
-  pointer-events: none; /* disables hover state when active */
+.story-tab:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
 }
 
-/* ============================================================= Monitor */
-.monitor {
-  background: var(--brand-white);
+.story-tab--active,
+.story-tab--active:hover {
+  background: rgba(175, 218, 219, 0.1);
+}
+
+.story-tab__number {
+  flex-shrink: 0;
+  width: 36px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: normal;
+  color: #c7c7c7;
+  transition: color 0.25s ease;
+}
+
+.story-tab--active .story-tab__number {
+  color: var(--brand-primary);
+}
+
+.story-tab__divider {
+  flex-shrink: 0;
+  align-self: center;
+  width: 0.5px;
+  height: 24px;
+  background: var(--neutral-5);
+}
+
+.story-tab__label {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.167;
+  color: #313131;
+  white-space: nowrap;
+}
+
+.story-tab--active .story-tab__label {
+  font-weight: 500;
+}
+
+/* ------------------------------------------------------------ Card */
+.story-card {
+  flex: 0 0 644px;
+  min-width: 0;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(221, 221, 221, 0.87);
+  border-radius: var(--round-lg);
   overflow: hidden;
+  background: var(--brand-white);
 }
 
-.monitor__inner {
-  max-width: var(--page-max);
-  margin: 0 auto;
-  padding: 60px 64px;
-  min-height: 560px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 40px;
-  animation: monitor-fade-in 0.35s ease;
-}
-
-@keyframes monitor-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.monitor__visual {
+.story-card__media {
   position: relative;
-  flex: 0 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 340px;
-  max-width: 100%;
+  height: 480px;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: #f9f9f9;
 }
 
-.monitor__halo {
+/* Blurred brand-secondary glows (Figma "Ellipse 2464", 834×812 with blur) */
+.story-card__glow {
   position: absolute;
-  width: 320px;
-  height: 320px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(175, 218, 219, 0.55) 0%,
-    rgba(175, 218, 219, 0) 70%
-  );
-  z-index: 0;
+  width: 834px;
+  height: 812px;
+  max-width: none;
+  pointer-events: none;
 }
 
-.monitor__phone {
-  position: relative;
-  z-index: 1;
-  width: 265px;
-  height: auto;
-  object-fit: cover;
-  border-radius: 40px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+.story-card__glow--top {
+  top: -374px;
+  left: calc(73.84% - 417px);
 }
 
-.monitor__content {
-  flex: 0 1 492px;
-  max-width: 492px;
+.story-card__glow--left {
+  top: -43px;
+  left: -441px;
 }
 
-.monitor__title {
-  margin: 0 0 12px;
+.story-card__glow--left-2 {
+  top: -74px;
+  left: -426.5px;
+}
+
+.story-card__phone {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 250px;
+  transform: translateX(-50%);
+  animation: story-card-in 0.4s ease;
+}
+
+.story-card__body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  min-height: 200px;
+  padding: 12px 16px;
+  animation: story-card-in 0.35s ease;
+}
+
+.story-card__title {
+  margin: 0;
   font-family: var(--font-heading);
   font-weight: 600;
-  font-size: 37px;
+  font-size: 28px;
   line-height: 1.167;
   color: var(--brand-primary);
 }
 
-.monitor__text {
-  font-family: var(--font-heading);
-  font-weight: 500;
+.story-card__details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.story-card__text {
+  font-family: var(--font-body);
+  font-weight: 300;
   font-size: 20px;
-  line-height: 1.4;
+  line-height: normal;
   color: var(--brand-neutral-dark);
 }
 
-@media (max-width: 1100px) {
-  .health-story {
-    padding: 96px 24px 40px;
-  }
+.story-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 
-  .monitor__inner {
-    flex-direction: column;
-    text-align: center;
-    min-height: auto;
-    padding: 48px 40px;
-  }
+.story-card__tag {
+  padding: 5px 12px;
+  border: 1px solid rgba(156, 156, 156, 0.35);
+  border-radius: 24px;
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 15px;
+  line-height: normal;
+  color: var(--brand-neutral-dark);
+  white-space: nowrap;
+}
 
-  .monitor__content {
-    flex: none;
-    width: 100%;
-    max-width: 520px;
-    text-align: center;
+@keyframes story-card-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
-@media (max-width: 720px) {
-  .health-story {
-    padding: 64px 24px 32px;
-  }
+.health-story__preload {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
 
-  .monitor__inner {
-    padding: 40px 24px;
+/* ------------------------------------------------------------ Responsive */
+@media (max-width: 1279px) {
+  .health-story__inner {
+    padding: 72px 64px;
     gap: 32px;
   }
 
-  .monitor__title {
-    font-size: 28px;
+  .story-card {
+    flex-basis: 52%;
+  }
+
+  .story-tab {
+    padding: 20px;
+  }
+
+  .story-tab__label {
+    font-size: 18px;
   }
 }
 
-@media (max-width: 480px) {
-  .health-story {
-    padding: 40px 20px 24px;
+@media (max-width: 1023px) {
+  .health-story__inner {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 64px 40px;
+    gap: 32px;
   }
 
-  .health-story__title {
-    font-size: 22px;
-    margin-bottom: 28px;
+  .health-story__intro {
+    gap: 32px;
+  }
+
+  .health-story__break {
+    display: none;
+  }
+
+  /* Tabs become a horizontal, scrollable strip above the card */
+  .health-story__tabs {
+    flex-direction: row;
+    gap: 8px;
+    margin: 0 -40px;
+    padding: 0 40px 4px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+
+  .health-story__tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .story-tab {
+    flex-shrink: 0;
+    width: auto;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    border: 1px solid var(--neutral-5);
+    border-radius: 40px;
+    scroll-snap-align: start;
+  }
+
+  .story-tab--active,
+  .story-tab--active:hover {
+    border-color: rgba(19, 84, 139, 0.35);
+  }
+
+  .story-tab__number,
+  .story-tab__label {
+    font-size: 16px;
+  }
+
+  .story-tab__number {
+    width: auto;
+  }
+
+  .story-tab__divider {
+    height: 16px;
+  }
+
+  .story-card {
+    flex-basis: auto;
+    width: 100%;
+    max-width: 644px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 767px) {
+  .health-story__inner {
+    padding: 56px 24px;
   }
 
   .health-story__tabs {
-    gap: 10px;
+    margin: 0 -24px;
+    padding: 0 24px 4px;
   }
 
-  .tab-pill {
-    font-size: 13px;
-    padding: 9px 16px;
+  .health-story__title {
+    font-size: 30px;
+    line-height: 1.25;
   }
 
-  .monitor__inner {
-    padding: 32px 20px;
-    gap: 24px;
+  .health-story__subtitle {
+    font-size: 17px;
   }
 
-  .monitor__visual {
-    width: 220px;
+  .story-card__media {
+    height: 400px;
   }
 
-  .monitor__halo {
-    width: 220px;
-    height: 220px;
+  .story-card__phone {
+    width: 210px;
   }
 
-  .monitor__phone {
-    width: 180px;
-    border-radius: 28px;
+  .story-card__body {
+    min-height: 0;
+    padding: 20px 16px;
   }
 
-  .monitor__title {
+  .story-card__title {
     font-size: 22px;
   }
 
-  .monitor__text {
+  .story-card__text {
     font-size: 16px;
+  }
+
+  .story-card__tag {
+    font-size: 13px;
   }
 }
