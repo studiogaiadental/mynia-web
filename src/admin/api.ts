@@ -99,34 +99,134 @@ export async function deleteApk(token: string, id: string): Promise<void> {
   await request<void>(`/apks/${id}`, { token, method: 'DELETE' })
 }
 
+export type ApkUploadDetails = ApkDetails & { activate: boolean }
+
 export type UploadHandle = {
   promise: Promise<Apk>
   abort: () => void
 }
 
-// XMLHttpRequest rather than fetch: fetch can't report upload progress, and a
-// release APK is over 100 MB.
-export function uploadApk(
+type UploadSession = { id: string; chunkSize: number; totalChunks: number }
+
+// Tries per chunk before the upload gives up. Only failures a retry can fix
+// are retried: a dropped connection or a server error.
+const CHUNK_ATTEMPTS = 3
+
+function isRetryable(err: unknown): boolean {
+  return err instanceof ApiError && (err.status === 0 || err.status >= 500)
+}
+
+function sendChunk(
   token: string,
-  form: FormData,
-  onProgress: (loaded: number, total: number) => void,
-): UploadHandle {
-  const xhr = new XMLHttpRequest()
-  const promise = new Promise<Apk>((resolve, reject) => {
-    xhr.open('POST', `${API_BASE_URL}/apks`)
+  upload: UploadSession,
+  index: number,
+  chunk: Blob,
+  onProgress: (loaded: number) => void,
+  onStart: (xhr: XMLHttpRequest) => void,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    onStart(xhr)
+    xhr.open('PUT', `${API_BASE_URL}/apks/uploads/${upload.id}/chunks/${index}`)
     xhr.setRequestHeader('Authorization', `Bearer ${token}`)
+    xhr.setRequestHeader('Content-Type', 'application/octet-stream')
     xhr.responseType = 'json'
     xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) onProgress(event.loaded, event.total)
+      if (event.lengthComputable) onProgress(event.loaded)
     }
     xhr.onload = () => {
-      const body = xhr.response as { apk?: Apk; error?: string } | null
-      if (xhr.status === 201 && body?.apk) resolve(body.apk)
-      else reject(new ApiError(xhr.status, body?.error ?? `Upload failed (${xhr.status})`))
+      if (xhr.status >= 200 && xhr.status < 300) return resolve()
+      const body = xhr.response as { error?: string } | null
+      reject(new ApiError(xhr.status, body?.error ?? `Upload failed (${xhr.status})`))
     }
-    xhr.onerror = () => reject(new ApiError(0, NETWORK_ERROR))
+    // No status at all: the connection dropped, or a proxy refused the
+    // request without CORS headers -- typically a request-size limit.
+    xhr.onerror = () =>
+      reject(
+        new ApiError(
+          0,
+          `Sending part ${index + 1} of ${upload.totalChunks} failed. Check your connection; if it keeps failing, a proxy in front of the API may be refusing the request size.`,
+        ),
+      )
     xhr.onabort = () => reject(new UploadCancelledError())
-    xhr.send(form)
+    xhr.send(chunk)
   })
-  return { promise, abort: () => xhr.abort() }
+}
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+// Sent in chunks rather than one request: Cloudflare in front of the API
+// refuses request bodies over 100 MB, and a release APK is bigger than that.
+// The server picks the chunk size. The chunks go through XMLHttpRequest
+// because fetch can't report upload progress.
+export function uploadApk(
+  token: string,
+  file: File,
+  details: ApkUploadDetails,
+  onProgress: (loaded: number, total: number) => void,
+): UploadHandle {
+  let cancelled = false
+  let current: XMLHttpRequest | null = null
+  let uploadId: string | null = null
+
+  const run = async (): Promise<Apk> => {
+    const { upload } = await request<{ upload: UploadSession }>('/apks/uploads', {
+      token,
+      method: 'POST',
+      body: { fileName: file.name, fileSize: file.size, ...details },
+    })
+    uploadId = upload.id
+
+    let sent = 0
+    for (let index = 0; index < upload.totalChunks; index++) {
+      const chunk = file.slice(index * upload.chunkSize, (index + 1) * upload.chunkSize)
+      for (let attempt = 1; ; attempt++) {
+        if (cancelled) throw new UploadCancelledError()
+        try {
+          await sendChunk(
+            token,
+            upload,
+            index,
+            chunk,
+            (loaded) => onProgress(sent + loaded, file.size),
+            (xhr) => {
+              current = xhr
+            },
+          )
+          break
+        } catch (err) {
+          if (cancelled || attempt >= CHUNK_ATTEMPTS || !isRetryable(err)) throw err
+          await wait(1000 * attempt)
+        }
+      }
+      sent += chunk.size
+      onProgress(sent, file.size)
+    }
+
+    if (cancelled) throw new UploadCancelledError()
+    const done = await request<{ apk: Apk }>(`/apks/uploads/${upload.id}/complete`, {
+      token,
+      method: 'POST',
+    })
+    return done.apk
+  }
+
+  const promise = run().catch((err: unknown) => {
+    // Don't leave the partly uploaded file on the server. After a 401 there's
+    // no session to do that with; the server sweeps it up later.
+    if (uploadId && !(err instanceof ApiError && err.status === 401)) {
+      void request<void>(`/apks/uploads/${uploadId}`, { token, method: 'DELETE' }).catch(
+        () => undefined,
+      )
+    }
+    throw err
+  })
+
+  return {
+    promise,
+    abort: () => {
+      cancelled = true
+      current?.abort()
+    },
+  }
 }
