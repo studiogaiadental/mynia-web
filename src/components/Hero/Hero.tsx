@@ -1,4 +1,5 @@
 import ArrowButton from '../ui/ArrowButton'
+import { APK_DOWNLOAD_URL } from '../../lib/api'
 import './Hero.css'
 
 const bgPhoto = '/assets/hero/hero-bg-photo.jpg'
@@ -29,7 +30,7 @@ export default function Hero() {
               seamless experience.
             </p>
           </div>
-          <ArrowButton>Download Now</ArrowButton>
+          <ArrowButton href={APK_DOWNLOAD_URL}>Download Now</ArrowButton>
         </div>
         <div className="hero__visual" data-aos="fade-left" data-aos-delay="200">
           <img className="hero__circles" src={circles} alt="" aria-hidden="true" />
