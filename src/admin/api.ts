@@ -99,6 +99,38 @@ export async function deleteApk(token: string, id: string): Promise<void> {
   await request<void>(`/apks/${id}`, { token, method: 'DELETE' })
 }
 
+export type OcrWarmStatus = {
+  warmMode: {
+    enabled: boolean
+    autoOffHours: number
+    enabledAt: string | null
+    enabledBy: string | null
+    disabledAt: string | null
+    /** An admin username, or "auto-off" when inactivity switched it off. */
+    disabledBy: string | null
+    lastOcrRequestAt: string | null
+    /** When it will switch itself off; null while off. */
+    autoOffAt: string | null
+  }
+  runpod: {
+    configured: boolean
+    minWorkers: number | null
+    /** idle, initializing, ready, running, throttled, unhealthy */
+    workers: Record<string, number> | null
+    error?: string
+  }
+}
+
+export type OcrWarmPatch = { enabled?: boolean; autoOffHours?: number }
+
+export async function getOcrWarmMode(token: string): Promise<OcrWarmStatus> {
+  return request<OcrWarmStatus>('/admin/ocr-warm-mode', { token })
+}
+
+export async function updateOcrWarmMode(token: string, patch: OcrWarmPatch): Promise<OcrWarmStatus> {
+  return request<OcrWarmStatus>('/admin/ocr-warm-mode', { token, method: 'PATCH', body: patch })
+}
+
 export type ApkUploadDetails = ApkDetails & { activate: boolean }
 
 export type UploadHandle = {
