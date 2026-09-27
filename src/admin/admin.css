@@ -599,10 +599,157 @@ body {
   gap: 8px;
 }
 
+/* ---- Section tabs (under the top bar) ---- */
+
+.admin-tabs {
+  display: flex;
+  gap: 4px;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.admin-tabs__tab {
+  padding: 10px 14px;
+  border-bottom: 2px solid transparent;
+  color: var(--md-grey);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.admin-tabs__tab:hover {
+  color: var(--brand-primary);
+}
+
+.admin-tabs__tab--active {
+  border-bottom-color: var(--brand-primary);
+  color: var(--brand-primary);
+  font-weight: 600;
+}
+
+/* ---- OCR warm mode ---- */
+
+.admin-badge--off {
+  background: var(--neutral-5);
+  color: var(--neutral-9);
+}
+
+.admin-warm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-warm__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.admin-warm__header .admin-card__title {
+  margin: 0;
+}
+
+.admin-warm__facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px 24px;
+  margin: 0;
+}
+
+.admin-warm__fact dt {
+  font-size: 13px;
+  color: var(--md-grey);
+}
+
+.admin-warm__fact dd {
+  margin: 2px 0 0;
+  font-weight: 500;
+  color: var(--brand-neutral-dark);
+}
+
+.admin-warm__hours fieldset {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.admin-warm__hours .admin-field {
+  flex: 1 1 280px;
+  max-width: 420px;
+}
+
+/* A checkbox drawn as an on/off switch. */
+.admin-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.admin-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.admin-switch__track {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--neutral-5);
+  transition: background 0.15s;
+}
+
+.admin-switch__track::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--brand-white);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: transform 0.15s;
+}
+
+.admin-switch input:checked + .admin-switch__track {
+  background: var(--brand-primary);
+}
+
+.admin-switch input:checked + .admin-switch__track::after {
+  transform: translateX(20px);
+}
+
+.admin-switch input:focus-visible + .admin-switch__track {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+.admin-switch input:disabled + .admin-switch__track,
+.admin-switch input:disabled ~ .admin-switch__label {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ---- Small screens: the table becomes a stack of cards ---- */
 
 @media (max-width: 720px) {
   .admin-topbar__inner,
+  .admin-tabs,
   .admin-main {
     padding-left: 16px;
     padding-right: 16px;

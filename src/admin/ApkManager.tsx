@@ -6,17 +6,14 @@ import { ApiError, activateApk, deleteApk, listApks, updateApk, type Apk, type A
 import { formatBytes } from './format'
 import type { AdminSession } from './session'
 
-const logo = '/assets/logo.png'
-
 type ApkManagerProps = {
   session: AdminSession
-  onLogout: () => void
   onSessionExpired: () => void
 }
 
 type Status = { kind: 'success' | 'error'; text: string }
 
-export default function ApkManager({ session, onLogout, onSessionExpired }: ApkManagerProps) {
+export default function ApkManager({ session, onSessionExpired }: ApkManagerProps) {
   const [apks, setApks] = useState<Apk[] | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [status, setStatus] = useState<Status | null>(null)
@@ -114,99 +111,80 @@ export default function ApkManager({ session, onLogout, onSessionExpired }: ApkM
   const active = apks?.find((apk) => apk.isActive) ?? null
 
   return (
-    <div className="admin">
-      <header className="admin-topbar">
-        <div className="admin-topbar__inner">
-          <div className="admin-topbar__brand">
-            <img className="admin-topbar__logo" src={logo} alt="GMedCC" />
-            <span className="admin-topbar__product">MyNia Admin</span>
-          </div>
-          <div className="admin-topbar__account">
-            <span className="admin-topbar__user">
-              Signed in as <strong>{session.username}</strong>
-            </span>
-            <button type="button" className="admin-button admin-button--secondary" onClick={onLogout}>
-              Log out
+    <main className="admin-main">
+      <div className="admin-page-heading">
+        <h1 className="admin-page-heading__title">Android APKs</h1>
+        <p className="admin-page-heading__text">
+          The active APK is the one the &ldquo;Download Now&rdquo; buttons on the landing page download.
+        </p>
+      </div>
+
+      <section className="admin-card admin-current" aria-labelledby="admin-current-title">
+        <h2 id="admin-current-title" className="admin-card__title">
+          Active download
+        </h2>
+        {apks === null ? (
+          <p className="admin-muted">Loading…</p>
+        ) : active ? (
+          <p className="admin-current__version">
+            <strong>{active.versionName}</strong>
+            {active.versionCode !== null && <span> · build {active.versionCode}</span>}
+            <span> · {formatBytes(active.fileSize)}</span>
+          </p>
+        ) : (
+          <p className="admin-current__none">
+            No APK is active yet, so the Download buttons won&rsquo;t work. Upload one and make it active.
+          </p>
+        )}
+        <p className="admin-current__link">
+          Public link:{' '}
+          <a href={APK_DOWNLOAD_URL} className="admin-link">
+            {APK_DOWNLOAD_URL}
+          </a>
+        </p>
+      </section>
+
+      <div className="admin-status" aria-live="polite">
+        {status && (
+          <p className={`admin-alert admin-alert--${status.kind}`}>
+            <span>{status.text}</span>
+            <button
+              type="button"
+              className="admin-alert__dismiss"
+              aria-label="Dismiss message"
+              onClick={() => setStatus(null)}
+            >
+              ×
+            </button>
+          </p>
+        )}
+      </div>
+
+      <UploadForm token={session.token} onUploaded={handleUploaded} onError={handleError} />
+
+      <section className="admin-card" aria-labelledby="admin-list-title">
+        <h2 id="admin-list-title" className="admin-card__title">
+          All APKs
+        </h2>
+        {loadError ? (
+          <div className="admin-alert admin-alert--error">
+            <span>{loadError}</span>
+            <button type="button" className="admin-button admin-button--secondary" onClick={() => void refresh()}>
+              Try again
             </button>
           </div>
-        </div>
-      </header>
-
-      <main className="admin-main">
-        <div className="admin-page-heading">
-          <h1 className="admin-page-heading__title">Android APKs</h1>
-          <p className="admin-page-heading__text">
-            The active APK is the one the &ldquo;Download Now&rdquo; buttons on the landing page download.
-          </p>
-        </div>
-
-        <section className="admin-card admin-current" aria-labelledby="admin-current-title">
-          <h2 id="admin-current-title" className="admin-card__title">
-            Active download
-          </h2>
-          {apks === null ? (
-            <p className="admin-muted">Loading…</p>
-          ) : active ? (
-            <p className="admin-current__version">
-              <strong>{active.versionName}</strong>
-              {active.versionCode !== null && <span> · build {active.versionCode}</span>}
-              <span> · {formatBytes(active.fileSize)}</span>
-            </p>
-          ) : (
-            <p className="admin-current__none">
-              No APK is active yet, so the Download buttons won&rsquo;t work. Upload one and make it active.
-            </p>
-          )}
-          <p className="admin-current__link">
-            Public link:{' '}
-            <a href={APK_DOWNLOAD_URL} className="admin-link">
-              {APK_DOWNLOAD_URL}
-            </a>
-          </p>
-        </section>
-
-        <div className="admin-status" aria-live="polite">
-          {status && (
-            <p className={`admin-alert admin-alert--${status.kind}`}>
-              <span>{status.text}</span>
-              <button
-                type="button"
-                className="admin-alert__dismiss"
-                aria-label="Dismiss message"
-                onClick={() => setStatus(null)}
-              >
-                ×
-              </button>
-            </p>
-          )}
-        </div>
-
-        <UploadForm token={session.token} onUploaded={handleUploaded} onError={handleError} />
-
-        <section className="admin-card" aria-labelledby="admin-list-title">
-          <h2 id="admin-list-title" className="admin-card__title">
-            All APKs
-          </h2>
-          {loadError ? (
-            <div className="admin-alert admin-alert--error">
-              <span>{loadError}</span>
-              <button type="button" className="admin-button admin-button--secondary" onClick={() => void refresh()}>
-                Try again
-              </button>
-            </div>
-          ) : apks === null ? (
-            <p className="admin-muted">Loading…</p>
-          ) : (
-            <ApkTable
-              apks={apks}
-              busyId={busyId}
-              onActivate={handleActivate}
-              onSave={handleSave}
-              onDelete={handleDelete}
-            />
-          )}
-        </section>
-      </main>
-    </div>
+        ) : apks === null ? (
+          <p className="admin-muted">Loading…</p>
+        ) : (
+          <ApkTable
+            apks={apks}
+            busyId={busyId}
+            onActivate={handleActivate}
+            onSave={handleSave}
+            onDelete={handleDelete}
+          />
+        )}
+      </section>
+    </main>
   )
 }
