@@ -102,7 +102,8 @@ export async function deleteApk(token: string, id: string): Promise<void> {
 export type OcrWarmStatus = {
   warmMode: {
     enabled: boolean
-    autoOffHours: number
+    /** Minutes with no KTP scan before it switches itself off. */
+    autoOffMinutes: number
     enabledAt: string | null
     enabledBy: string | null
     disabledAt: string | null
@@ -121,7 +122,7 @@ export type OcrWarmStatus = {
   }
 }
 
-export type OcrWarmPatch = { enabled?: boolean; autoOffHours?: number }
+export type OcrWarmPatch = { enabled?: boolean; autoOffMinutes?: number }
 
 export async function getOcrWarmMode(token: string): Promise<OcrWarmStatus> {
   return request<OcrWarmStatus>('/admin/ocr-warm-mode', { token })

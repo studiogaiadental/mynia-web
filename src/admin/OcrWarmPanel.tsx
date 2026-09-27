@@ -10,8 +10,10 @@ type OcrWarmPanelProps = {
 
 type Status = { kind: 'success' | 'error'; text: string }
 
-const MIN_HOURS = 1
-const MAX_HOURS = 168
+type Unit = 'minutes' | 'hours'
+
+// Matches the server's limit: 1 minute to 7 days.
+const MAX_MINUTES = 7 * 24 * 60
 // Live worker state changes while a worker boots; keep the readout current.
 const REFRESH_MS = 15_000
 // RunPod serverless price for the endpoint's GPU pool (AMPERE_16).
@@ -32,12 +34,24 @@ function when(iso: string | null): string {
   return iso ? formatDateTime(iso) : '—'
 }
 
+/** 90 -> "1 hour 30 minutes", 120 -> "2 hours", 45 -> "45 minutes". */
+function formatDuration(totalMinutes: number): string {
+  const h = Math.floor(totalMinutes / 60)
+  const m = totalMinutes % 60
+  const hours = h === 1 ? '1 hour' : `${h} hours`
+  const minutes = m === 1 ? '1 minute' : `${m} minutes`
+  if (h === 0) return minutes
+  if (m === 0) return hours
+  return `${hours} ${minutes}`
+}
+
 export default function OcrWarmPanel({ session, onSessionExpired }: OcrWarmPanelProps) {
   const [data, setData] = useState<OcrWarmStatus | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [status, setStatus] = useState<Status | null>(null)
   const [busy, setBusy] = useState(false)
-  const [hours, setHours] = useState('')
+  const [amount, setAmount] = useState('')
+  const [unit, setUnit] = useState<Unit>('hours')
 
   const refresh = useCallback(async () => {
     try {
@@ -58,11 +72,17 @@ export default function OcrWarmPanel({ session, onSessionExpired }: OcrWarmPanel
     return () => window.clearInterval(timer)
   }, [refresh])
 
-  // Fill the hours field once, from the saved value; after that it's the admin's.
-  const savedHours = data?.warmMode.autoOffHours
+  // Fill the field once, from the saved value, in whole hours when it is one;
+  // after that it's the admin's.
+  const savedMinutes = data?.warmMode.autoOffMinutes
+  const [filled, setFilled] = useState(false)
   useEffect(() => {
-    if (savedHours !== undefined) setHours((current) => (current === '' ? String(savedHours) : current))
-  }, [savedHours])
+    if (savedMinutes === undefined || filled) return
+    const inHours = savedMinutes % 60 === 0
+    setUnit(inHours ? 'hours' : 'minutes')
+    setAmount(String(inHours ? savedMinutes / 60 : savedMinutes))
+    setFilled(true)
+  }, [savedMinutes, filled])
 
   const apply = async (patch: OcrWarmPatch, success: string) => {
     setBusy(true)
@@ -87,7 +107,7 @@ export default function OcrWarmPanel({ session, onSessionExpired }: OcrWarmPanel
       enabled &&
       !window.confirm(
         `Turn on warm mode? It keeps one GPU worker running (about ${HOURLY_COST}) until it switches ` +
-          `itself off after ${data.warmMode.autoOffHours} hour(s) with no KTP scan.`,
+          `itself off after ${formatDuration(data.warmMode.autoOffMinutes)} with no KTP scan.`,
       )
     ) {
       return
@@ -100,14 +120,18 @@ export default function OcrWarmPanel({ session, onSessionExpired }: OcrWarmPanel
     )
   }
 
-  const handleSaveHours = (event: FormEvent<HTMLFormElement>) => {
+  const handleSaveAutoOff = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const n = Number(hours)
-    if (!Number.isInteger(n) || n < MIN_HOURS || n > MAX_HOURS) {
-      setStatus({ kind: 'error', text: `Enter a whole number of hours from ${MIN_HOURS} to ${MAX_HOURS}.` })
+    const n = Number(amount)
+    const minutes = unit === 'hours' ? n * 60 : n
+    if (!Number.isInteger(n) || n < 1 || minutes > MAX_MINUTES) {
+      setStatus({
+        kind: 'error',
+        text: `Enter a whole number: 1–${MAX_MINUTES} minutes or 1–${MAX_MINUTES / 60} hours (7 days).`,
+      })
       return
     }
-    void apply({ autoOffHours: n }, `Auto-off set to ${n} hour(s) without a KTP scan.`)
+    void apply({ autoOffMinutes: minutes }, `Auto-off set to ${formatDuration(minutes)} without a KTP scan.`)
   }
 
   const warm = data?.warmMode
@@ -122,7 +146,7 @@ export default function OcrWarmPanel({ session, onSessionExpired }: OcrWarmPanel
         <p className="admin-page-heading__text">
           KTP scans try the RunPod GPU model first. When no worker is running, the first scan waits about a
           minute for one to boot and falls back to the old OCR in the meantime. Warm mode keeps one worker
-          running so every scan uses RunPod, then switches itself off after the set hours with no KTP scan.
+          running so every scan uses RunPod, then switches itself off after the set time with no KTP scan.
         </p>
       </div>
 
@@ -204,25 +228,42 @@ export default function OcrWarmPanel({ session, onSessionExpired }: OcrWarmPanel
             <h2 id="admin-warm-hours-title" className="admin-card__title">
               Auto-off
             </h2>
-            <form className="admin-warm__hours" onSubmit={handleSaveHours}>
+            <p className="admin-muted">
+              Currently: switches off after <strong>{formatDuration(warm.autoOffMinutes)}</strong> with no KTP scan.
+            </p>
+            <form className="admin-warm__auto-off" onSubmit={handleSaveAutoOff}>
               <fieldset disabled={busy}>
-                <label className="admin-field">
-                  <span className="admin-field__label">Switch off after this many hours with no KTP scan</span>
-                  <input
-                    className="admin-input"
-                    type="number"
-                    inputMode="numeric"
-                    min={MIN_HOURS}
-                    max={MAX_HOURS}
-                    step={1}
-                    value={hours}
-                    onChange={(e) => setHours(e.target.value)}
-                  />
+                <div className="admin-field">
+                  <label className="admin-field__label" htmlFor="admin-warm-amount">
+                    Switch off after this long with no KTP scan
+                  </label>
+                  <div className="admin-warm__duration">
+                    <input
+                      id="admin-warm-amount"
+                      className="admin-input"
+                      type="number"
+                      inputMode="numeric"
+                      min={1}
+                      max={unit === 'hours' ? MAX_MINUTES / 60 : MAX_MINUTES}
+                      step={1}
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                    />
+                    <select
+                      className="admin-input admin-warm__unit"
+                      aria-label="Unit"
+                      value={unit}
+                      onChange={(e) => setUnit(e.target.value as Unit)}
+                    >
+                      <option value="minutes">Minutes</option>
+                      <option value="hours">Hours</option>
+                    </select>
+                  </div>
                   <span className="admin-field__hint">
-                    {MIN_HOURS}–{MAX_HOURS} hours. Checked every 5 minutes. At most about {HOURLY_COST} × this many
-                    hours after the last scan.
+                    Up to 7 days. Checked every minute. Costs at most about {HOURLY_COST} for this long after the
+                    last scan.
                   </span>
-                </label>
+                </div>
                 <button type="submit" className="admin-button admin-button--primary">
                   {busy ? 'Saving…' : 'Save'}
                 </button>

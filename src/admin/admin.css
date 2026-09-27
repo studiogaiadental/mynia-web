@@ -672,7 +672,11 @@ body {
   color: var(--brand-neutral-dark);
 }
 
-.admin-warm__hours fieldset {
+.admin-warm__auto-off {
+  margin-top: 12px;
+}
+
+.admin-warm__auto-off fieldset {
   display: flex;
   align-items: flex-end;
   gap: 16px;
@@ -682,9 +686,25 @@ body {
   border: 0;
 }
 
-.admin-warm__hours .admin-field {
+.admin-warm__auto-off .admin-field {
   flex: 1 1 280px;
   max-width: 420px;
+}
+
+/* The number and its unit, side by side. */
+.admin-warm__duration {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-warm__duration .admin-input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.admin-warm__duration .admin-warm__unit {
+  flex: 0 0 120px;
+  cursor: pointer;
 }
 
 /* A checkbox drawn as an on/off switch. */
