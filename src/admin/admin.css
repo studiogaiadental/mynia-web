@@ -672,6 +672,62 @@ body {
   color: var(--brand-neutral-dark);
 }
 
+/* Picks which OCR version's warm mode is shown; each shows its own On/Off. */
+.admin-versions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-versions__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  background: var(--brand-white);
+  color: var(--brand-neutral-dark);
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.admin-versions__option:hover {
+  border-color: var(--brand-primary);
+}
+
+.admin-versions__option--active {
+  border-color: var(--brand-primary);
+  background: var(--brand-secondary);
+  color: var(--brand-primary);
+  font-weight: 600;
+}
+
+.admin-versions__option:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+/* The active option is the badge's own colour, so the badge goes white on it. */
+.admin-versions__option--active .admin-badge {
+  background: var(--brand-white);
+}
+
+.admin-versions__option--active .admin-badge--off {
+  background: var(--neutral-5);
+}
+
+/* The chosen version's cards, spaced like the page's own. */
+.admin-warm-version {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
 .admin-warm__auto-off {
   margin-top: 12px;
 }
