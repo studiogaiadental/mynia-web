@@ -53,10 +53,11 @@ export default function OcrWarmPanel({ session, onSessionExpired }: OcrWarmPanel
       <div className="admin-page-heading">
         <h1 className="admin-page-heading__title">OCR warm mode</h1>
         <p className="admin-page-heading__text">
-          KTP scans try the RunPod GPU model first. When no worker is running, the first scan waits for one to
-          boot and falls back to the old OCR in the meantime. Warm mode keeps one worker running so every scan
-          uses RunPod, then switches itself off after the set time. Each OCR version is its own RunPod endpoint,
-          so each has its own switch and auto-off time.
+          The app&rsquo;s scans go to the OCR version set on the server (RUNPOD_OCR_VERSION). KTP scans try the
+          RunPod GPU model first; when no worker is running, the first scan waits for one to boot and falls back
+          to the old OCR in the meantime. Warm mode keeps one worker running so every scan uses RunPod, then
+          switches itself off after the set time. Each OCR version is its own RunPod endpoint, so each has its own
+          switch and auto-off time.
         </p>
       </div>
 

@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
-import { ApiError, updateOcrWarmMode, type OcrWarmPatch, type OcrWarmStatus } from './api'
+import { ApiError, updateOcrWarmMode, type OcrScanType, type OcrWarmPatch, type OcrWarmStatus } from './api'
 import { formatDateTime } from './format'
 import { versionInfo } from './ocrVersions'
 import type { AdminSession } from './session'
@@ -45,19 +45,28 @@ function formatDuration(totalMinutes: number): string {
   return `${hours} ${minutes}`
 }
 
+/** The documents a version's scans cover, for the copy: "KTP", "KTP or KK"; "" for none. */
+function scanNoun(scanTypes: OcrScanType[]): string {
+  return scanTypes.join(' or ')
+}
+
 /**
  * When it switches itself off. Only the version the app's scans use is kept
  * alive by them; any other counts from when it was turned on.
  */
-function autoOffRule(servesScans: boolean, minutes: number): string {
-  return servesScans
-    ? `after ${formatDuration(minutes)} with no KTP scan`
+function autoOffRule(scanTypes: OcrScanType[], minutes: number): string {
+  return scanTypes.length > 0
+    ? `after ${formatDuration(minutes)} with no ${scanNoun(scanTypes)} scan`
     : `${formatDuration(minutes)} after it is turned on`
 }
 
 /** One OCR version's warm mode: its switch, auto-off time and live RunPod endpoint. */
 export default function OcrWarmVersionPanel({ session, data, onChange, onSessionExpired }: OcrWarmVersionPanelProps) {
-  const { version, servesScans, warmMode: warm, runpod } = data
+  const { version, warmMode: warm, runpod } = data
+  // Servers from before scanTypes only say whether KTP scans use this version.
+  const scanTypes: OcrScanType[] = data.scanTypes ?? (data.servesScans ? ['KTP'] : [])
+  const servesScans = scanTypes.length > 0
+  const scans = scanNoun(scanTypes)
   const info = versionInfo(version)
   const [status, setStatus] = useState<Status | null>(null)
   const [busy, setBusy] = useState(false)
@@ -97,7 +106,7 @@ export default function OcrWarmVersionPanel({ session, data, onChange, onSession
       enabled &&
       !window.confirm(
         `Turn on ${info.label} warm mode? It keeps one GPU worker running (about ${info.hourlyCost}) until it ` +
-          `switches itself off ${autoOffRule(servesScans, warm.autoOffMinutes)}.`,
+          `switches itself off ${autoOffRule(scanTypes, warm.autoOffMinutes)}.`,
       )
     ) {
       return
@@ -123,7 +132,7 @@ export default function OcrWarmVersionPanel({ session, data, onChange, onSession
     }
     void apply(
       { autoOffMinutes: minutes },
-      `${info.label} auto-off set to ${autoOffRule(servesScans, minutes)}.`,
+      `${info.label} auto-off set to ${autoOffRule(scanTypes, minutes)}.`,
     )
   }
 
@@ -172,9 +181,15 @@ export default function OcrWarmVersionPanel({ session, data, onChange, onSession
         <p className="admin-muted">
           {info.model ? `${info.model}. ` : ''}
           {servesScans
-            ? "The app's KTP scans use this version."
-            : "The app's KTP scans don't use this version, so scans don't keep it on."}
+            ? `The app's ${scans} scans use this version.`
+            : "The app's scans don't use this version, so scans don't keep it on."}
         </p>
+        {scanTypes.includes('KK') && (
+          <p className="admin-muted">
+            KK scans have no fallback: while no worker is running, a KK scan fails and the user is asked to try
+            again in a minute or two. Turn warm mode on for events.
+          </p>
+        )}
 
         {!runpod.configured && (
           <p className="admin-current__none">
@@ -198,7 +213,9 @@ export default function OcrWarmVersionPanel({ session, data, onChange, onSession
                 : 'never turned on'}
           </Fact>
           <Fact label="Switches off at">{warm.enabled ? when(warm.autoOffAt) : '—'}</Fact>
-          <Fact label="Last KTP scan">{servesScans ? when(warm.lastOcrRequestAt) : 'Not used for scans'}</Fact>
+          <Fact label={servesScans ? `Last ${scans} scan` : 'Last scan'}>
+            {servesScans ? when(warm.lastOcrRequestAt) : 'Not used for scans'}
+          </Fact>
         </dl>
       </section>
 
@@ -207,13 +224,13 @@ export default function OcrWarmVersionPanel({ session, data, onChange, onSession
           Auto-off
         </h2>
         <p className="admin-muted">
-          Currently: switches off <strong>{autoOffRule(servesScans, warm.autoOffMinutes)}</strong>.
+          Currently: switches off <strong>{autoOffRule(scanTypes, warm.autoOffMinutes)}</strong>.
         </p>
         <form className="admin-warm__auto-off" onSubmit={handleSaveAutoOff}>
           <fieldset disabled={busy}>
             <div className="admin-field">
               <label className="admin-field__label" htmlFor={`admin-warm-amount-${version}`}>
-                {servesScans ? 'Switch off after this long with no KTP scan' : 'Switch off this long after turning on'}
+                {servesScans ? `Switch off after this long with no ${scans} scan` : 'Switch off this long after turning on'}
               </label>
               <div className="admin-warm__duration">
                 <input

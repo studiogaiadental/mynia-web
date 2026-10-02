@@ -102,13 +102,22 @@ export async function deleteApk(token: string, id: string): Promise<void> {
 /** The KTP extractor versions, each its own RunPod endpoint with its own warm mode. */
 export type OcrVersion = 'v5' | 'v6'
 
+/** A document the app scans: an ID card (KTP) or a family card (KK). */
+export type OcrScanType = 'KTP' | 'KK'
+
 export type OcrWarmStatus = {
   version: OcrVersion
-  /** The app's KTP scans are sent to this version's endpoint. */
+  /**
+   * The documents the app's scans send to this version's endpoint (the server's
+   * RUNPOD_OCR_VERSION); empty for every other version. Missing on servers
+   * from before it existed.
+   */
+  scanTypes?: OcrScanType[]
+  /** `scanTypes` is not empty. */
   servesScans: boolean
   warmMode: {
     enabled: boolean
-    /** Minutes with no KTP scan before it switches itself off. */
+    /** Minutes with no scan before it switches itself off. */
     autoOffMinutes: number
     enabledAt: string | null
     enabledBy: string | null
