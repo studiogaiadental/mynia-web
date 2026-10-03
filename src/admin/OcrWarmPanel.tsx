@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from 'react'
-import { ApiError, getOcrWarmMode, updateOcrWarmMode, type OcrWarmPatch, type OcrWarmStatus } from './api'
-import { formatDateTime } from './format'
+import { useCallback, useEffect, useState } from 'react'
+import { ApiError, listOcrWarmModes, type OcrVersion, type OcrWarmStatus } from './api'
+import OcrWarmVersionPanel from './OcrWarmVersionPanel'
+import { versionInfo } from './ocrVersions'
 import type { AdminSession } from './session'
 
 type OcrWarmPanelProps = {
@@ -8,54 +9,17 @@ type OcrWarmPanelProps = {
   onSessionExpired: () => void
 }
 
-type Status = { kind: 'success' | 'error'; text: string }
-
-type Unit = 'minutes' | 'hours'
-
-// Matches the server's limit: 1 minute to 7 days.
-const MAX_MINUTES = 7 * 24 * 60
 // Live worker state changes while a worker boots; keep the readout current.
 const REFRESH_MS = 15_000
-// RunPod serverless price for the endpoint's GPU pool (AMPERE_16).
-const HOURLY_COST = '$0.58/hr'
-
-const WORKER_STATES = ['ready', 'idle', 'initializing', 'running', 'throttled', 'unhealthy']
-
-function Fact({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="admin-warm__fact">
-      <dt>{label}</dt>
-      <dd>{children}</dd>
-    </div>
-  )
-}
-
-function when(iso: string | null): string {
-  return iso ? formatDateTime(iso) : '—'
-}
-
-/** 90 -> "1 hour 30 minutes", 120 -> "2 hours", 45 -> "45 minutes". */
-function formatDuration(totalMinutes: number): string {
-  const h = Math.floor(totalMinutes / 60)
-  const m = totalMinutes % 60
-  const hours = h === 1 ? '1 hour' : `${h} hours`
-  const minutes = m === 1 ? '1 minute' : `${m} minutes`
-  if (h === 0) return minutes
-  if (m === 0) return hours
-  return `${hours} ${minutes}`
-}
 
 export default function OcrWarmPanel({ session, onSessionExpired }: OcrWarmPanelProps) {
-  const [data, setData] = useState<OcrWarmStatus | null>(null)
+  const [modes, setModes] = useState<OcrWarmStatus[] | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
-  const [status, setStatus] = useState<Status | null>(null)
-  const [busy, setBusy] = useState(false)
-  const [amount, setAmount] = useState('')
-  const [unit, setUnit] = useState<Unit>('hours')
+  const [selected, setSelected] = useState<OcrVersion | null>(null)
 
   const refresh = useCallback(async () => {
     try {
-      setData(await getOcrWarmMode(session.token))
+      setModes(await listOcrWarmModes(session.token))
       setLoadError(null)
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
@@ -72,98 +36,29 @@ export default function OcrWarmPanel({ session, onSessionExpired }: OcrWarmPanel
     return () => window.clearInterval(timer)
   }, [refresh])
 
-  // Fill the field once, from the saved value, in whole hours when it is one;
-  // after that it's the admin's.
-  const savedMinutes = data?.warmMode.autoOffMinutes
-  const [filled, setFilled] = useState(false)
+  // Start on the version the app's scans use; after that the choice is the admin's.
   useEffect(() => {
-    if (savedMinutes === undefined || filled) return
-    const inHours = savedMinutes % 60 === 0
-    setUnit(inHours ? 'hours' : 'minutes')
-    setAmount(String(inHours ? savedMinutes / 60 : savedMinutes))
-    setFilled(true)
-  }, [savedMinutes, filled])
+    if (selected || !modes || modes.length === 0) return
+    setSelected((modes.find((m) => m.servesScans) ?? modes[0]).version)
+  }, [modes, selected])
 
-  const apply = async (patch: OcrWarmPatch, success: string) => {
-    setBusy(true)
-    setStatus(null)
-    try {
-      setData(await updateOcrWarmMode(session.token, patch))
-      setStatus({ kind: 'success', text: success })
-    } catch (err) {
-      if (err instanceof ApiError && err.status === 401) {
-        onSessionExpired()
-        return
-      }
-      setStatus({ kind: 'error', text: err instanceof Error ? err.message : "Couldn't update OCR warm mode." })
-    } finally {
-      setBusy(false)
-    }
-  }
+  const handleChange = useCallback((next: OcrWarmStatus) => {
+    setModes((current) => current && current.map((m) => (m.version === next.version ? next : m)))
+  }, [])
 
-  const handleToggle = (enabled: boolean) => {
-    if (!data) return
-    if (
-      enabled &&
-      !window.confirm(
-        `Turn on warm mode? It keeps one GPU worker running (about ${HOURLY_COST}) until it switches ` +
-          `itself off after ${formatDuration(data.warmMode.autoOffMinutes)} with no KTP scan.`,
-      )
-    ) {
-      return
-    }
-    void apply(
-      { enabled },
-      enabled
-        ? 'Warm mode is on. The worker takes a minute or two to boot before scans get faster.'
-        : 'Warm mode is off. The endpoint scales back to zero.',
-    )
-  }
-
-  const handleSaveAutoOff = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const n = Number(amount)
-    const minutes = unit === 'hours' ? n * 60 : n
-    if (!Number.isInteger(n) || n < 1 || minutes > MAX_MINUTES) {
-      setStatus({
-        kind: 'error',
-        text: `Enter a whole number: 1–${MAX_MINUTES} minutes or 1–${MAX_MINUTES / 60} hours (7 days).`,
-      })
-      return
-    }
-    void apply({ autoOffMinutes: minutes }, `Auto-off set to ${formatDuration(minutes)} without a KTP scan.`)
-  }
-
-  const warm = data?.warmMode
-  const runpod = data?.runpod
-  // Stored as on, but someone set min workers back to 0 in the RunPod console.
-  const drifted = warm?.enabled && runpod?.minWorkers === 0
+  const current = modes?.find((m) => m.version === selected)
 
   return (
     <main className="admin-main">
       <div className="admin-page-heading">
         <h1 className="admin-page-heading__title">OCR warm mode</h1>
         <p className="admin-page-heading__text">
-          KTP scans try the RunPod GPU model first. When no worker is running, the first scan waits about a
-          minute for one to boot and falls back to the old OCR in the meantime. Warm mode keeps one worker
-          running so every scan uses RunPod, then switches itself off after the set time with no KTP scan.
+          The app&rsquo;s scans go to the OCR version set on the server (RUNPOD_OCR_VERSION). KTP scans try the
+          RunPod GPU model first; when no worker is running, the first scan waits for one to boot and falls back
+          to the old OCR in the meantime. Warm mode keeps one worker running so every scan uses RunPod, then
+          switches itself off after the set time. Each OCR version is its own RunPod endpoint, so each has its own
+          switch and auto-off time.
         </p>
-      </div>
-
-      <div className="admin-status" aria-live="polite">
-        {status && (
-          <p className={`admin-alert admin-alert--${status.kind}`}>
-            <span>{status.text}</span>
-            <button
-              type="button"
-              className="admin-alert__dismiss"
-              aria-label="Dismiss message"
-              onClick={() => setStatus(null)}
-            >
-              ×
-            </button>
-          </p>
-        )}
       </div>
 
       {loadError ? (
@@ -173,123 +68,48 @@ export default function OcrWarmPanel({ session, onSessionExpired }: OcrWarmPanel
             Try again
           </button>
         </div>
-      ) : !warm || !runpod ? (
+      ) : !modes || !current ? (
         <p className="admin-muted">Loading…</p>
       ) : (
         <>
-          <section className="admin-card admin-warm" aria-labelledby="admin-warm-title">
-            <div className="admin-warm__header">
-              <h2 id="admin-warm-title" className="admin-card__title">
-                Warm mode{' '}
-                <span className={`admin-badge${warm.enabled ? '' : ' admin-badge--off'}`}>
-                  {warm.enabled ? 'On' : 'Off'}
-                </span>
-              </h2>
-              <label className="admin-switch">
-                <input
-                  type="checkbox"
-                  role="switch"
-                  checked={warm.enabled}
-                  disabled={busy || !runpod.configured}
-                  onChange={(e) => handleToggle(e.target.checked)}
-                />
-                <span className="admin-switch__track" aria-hidden="true" />
-                <span className="admin-switch__label">{busy ? 'Saving…' : warm.enabled ? 'Turn off' : 'Turn on'}</span>
-              </label>
-            </div>
-
-            {!runpod.configured && (
-              <p className="admin-current__none">
-                RunPod management isn&rsquo;t configured on the server (RUNPOD_MANAGEMENT_API_KEY and
-                RUNPOD_OCR_ENDPOINT_ID), so warm mode can&rsquo;t be switched.
-              </p>
-            )}
-            {drifted && (
-              <p className="admin-current__none">
-                Warm mode is on here, but the RunPod endpoint&rsquo;s minimum workers is 0 (changed in the RunPod
-                console?). Turn it off and on again to re-apply.
-              </p>
-            )}
-
-            <dl className="admin-warm__facts">
-              <Fact label={warm.enabled ? 'On since' : 'Off since'}>
-                {warm.enabled
-                  ? `${when(warm.enabledAt)} by ${warm.enabledBy ?? '—'}`
-                  : warm.disabledAt
-                    ? `${when(warm.disabledAt)} by ${warm.disabledBy === 'auto-off' ? 'auto-off (no scans)' : (warm.disabledBy ?? '—')}`
-                    : 'never turned on'}
-              </Fact>
-              <Fact label="Switches off at">{warm.enabled ? when(warm.autoOffAt) : '—'}</Fact>
-              <Fact label="Last KTP scan">{when(warm.lastOcrRequestAt)}</Fact>
-            </dl>
-          </section>
-
-          <section className="admin-card" aria-labelledby="admin-warm-hours-title">
-            <h2 id="admin-warm-hours-title" className="admin-card__title">
-              Auto-off
-            </h2>
-            <p className="admin-muted">
-              Currently: switches off after <strong>{formatDuration(warm.autoOffMinutes)}</strong> with no KTP scan.
-            </p>
-            <form className="admin-warm__auto-off" onSubmit={handleSaveAutoOff}>
-              <fieldset disabled={busy}>
-                <div className="admin-field">
-                  <label className="admin-field__label" htmlFor="admin-warm-amount">
-                    Switch off after this long with no KTP scan
-                  </label>
-                  <div className="admin-warm__duration">
-                    <input
-                      id="admin-warm-amount"
-                      className="admin-input"
-                      type="number"
-                      inputMode="numeric"
-                      min={1}
-                      max={unit === 'hours' ? MAX_MINUTES / 60 : MAX_MINUTES}
-                      step={1}
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                    />
-                    <select
-                      className="admin-input admin-warm__unit"
-                      aria-label="Unit"
-                      value={unit}
-                      onChange={(e) => setUnit(e.target.value as Unit)}
-                    >
-                      <option value="minutes">Minutes</option>
-                      <option value="hours">Hours</option>
-                    </select>
-                  </div>
-                  <span className="admin-field__hint">
-                    Up to 7 days. Checked every minute. Costs at most about {HOURLY_COST} for this long after the
-                    last scan.
+          <div className="admin-versions" role="tablist" aria-label="OCR version">
+            {modes.map((m) => {
+              const active = m.version === current.version
+              return (
+                <button
+                  key={m.version}
+                  type="button"
+                  role="tab"
+                  id={`admin-warm-tab-${m.version}`}
+                  aria-selected={active}
+                  aria-controls="admin-warm-panel"
+                  className={`admin-versions__option${active ? ' admin-versions__option--active' : ''}`}
+                  onClick={() => setSelected(m.version)}
+                >
+                  {versionInfo(m.version).label}
+                  <span className={`admin-badge${m.warmMode.enabled ? '' : ' admin-badge--off'}`}>
+                    {m.warmMode.enabled ? 'On' : 'Off'}
                   </span>
-                </div>
-                <button type="submit" className="admin-button admin-button--primary">
-                  {busy ? 'Saving…' : 'Save'}
                 </button>
-              </fieldset>
-            </form>
-          </section>
+              )
+            })}
+          </div>
 
-          <section className="admin-card" aria-labelledby="admin-warm-runpod-title">
-            <h2 id="admin-warm-runpod-title" className="admin-card__title">
-              RunPod endpoint
-            </h2>
-            {runpod.error ? (
-              <p className="admin-current__none">{runpod.error}</p>
-            ) : !runpod.configured ? (
-              <p className="admin-muted">Not configured.</p>
-            ) : (
-              <dl className="admin-warm__facts">
-                <Fact label="Minimum workers">{runpod.minWorkers ?? '—'}</Fact>
-                {WORKER_STATES.map((state) => (
-                  <Fact key={state} label={state[0].toUpperCase() + state.slice(1)}>
-                    {runpod.workers?.[state] ?? 0}
-                  </Fact>
-                ))}
-              </dl>
-            )}
-          </section>
+          <div
+            id="admin-warm-panel"
+            className="admin-warm-version"
+            role="tabpanel"
+            aria-labelledby={`admin-warm-tab-${current.version}`}
+          >
+            {/* Keyed so each version has its own form state and messages. */}
+            <OcrWarmVersionPanel
+              key={current.version}
+              session={session}
+              data={current}
+              onChange={handleChange}
+              onSessionExpired={onSessionExpired}
+            />
+          </div>
         </>
       )}
     </main>

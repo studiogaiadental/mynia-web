@@ -99,10 +99,25 @@ export async function deleteApk(token: string, id: string): Promise<void> {
   await request<void>(`/apks/${id}`, { token, method: 'DELETE' })
 }
 
+/** The KTP extractor versions, each its own RunPod endpoint with its own warm mode. */
+export type OcrVersion = 'v5' | 'v6'
+
+/** A document the app scans: an ID card (KTP) or a family card (KK). */
+export type OcrScanType = 'KTP' | 'KK'
+
 export type OcrWarmStatus = {
+  version: OcrVersion
+  /**
+   * The documents the app's scans send to this version's endpoint (the server's
+   * RUNPOD_OCR_VERSION); empty for every other version. Missing on servers
+   * from before it existed.
+   */
+  scanTypes?: OcrScanType[]
+  /** `scanTypes` is not empty. */
+  servesScans: boolean
   warmMode: {
     enabled: boolean
-    /** Minutes with no KTP scan before it switches itself off. */
+    /** Minutes with no scan before it switches itself off. */
     autoOffMinutes: number
     enabledAt: string | null
     enabledBy: string | null
@@ -124,12 +139,17 @@ export type OcrWarmStatus = {
 
 export type OcrWarmPatch = { enabled?: boolean; autoOffMinutes?: number }
 
-export async function getOcrWarmMode(token: string): Promise<OcrWarmStatus> {
-  return request<OcrWarmStatus>('/admin/ocr-warm-mode', { token })
+/** Every version's warm mode, in version order. */
+export async function listOcrWarmModes(token: string): Promise<OcrWarmStatus[]> {
+  return (await request<{ modes: OcrWarmStatus[] }>('/admin/ocr-warm-modes', { token })).modes
 }
 
-export async function updateOcrWarmMode(token: string, patch: OcrWarmPatch): Promise<OcrWarmStatus> {
-  return request<OcrWarmStatus>('/admin/ocr-warm-mode', { token, method: 'PATCH', body: patch })
+export async function updateOcrWarmMode(
+  token: string,
+  version: OcrVersion,
+  patch: OcrWarmPatch,
+): Promise<OcrWarmStatus> {
+  return request<OcrWarmStatus>(`/admin/ocr-warm-mode/${version}`, { token, method: 'PATCH', body: patch })
 }
 
 export type ApkUploadDetails = ApkDetails & { activate: boolean }
