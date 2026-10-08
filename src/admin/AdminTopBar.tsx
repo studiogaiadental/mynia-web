@@ -1,19 +1,15 @@
-export type AdminPage = 'apks' | 'ocr'
-
 const logo = '/assets/logo.png'
 
-const PAGES: { id: AdminPage; label: string }[] = [
-  { id: 'apks', label: 'APKs' },
-  { id: 'ocr', label: 'OCR warm mode' },
-]
+// OCR warm mode moved to the AI panel (tools/ai-panel), which covers every AI
+// endpoint; linked here when the build knows where it lives.
+const AI_PANEL_URL = (import.meta.env.VITE_AI_PANEL_URL ?? '').trim()
 
 type AdminTopBarProps = {
   username: string
-  page: AdminPage
   onLogout: () => void
 }
 
-export default function AdminTopBar({ username, page, onLogout }: AdminTopBarProps) {
+export default function AdminTopBar({ username, onLogout }: AdminTopBarProps) {
   return (
     <header className="admin-topbar">
       <div className="admin-topbar__inner">
@@ -22,6 +18,16 @@ export default function AdminTopBar({ username, page, onLogout }: AdminTopBarPro
           <span className="admin-topbar__product">MyNia Admin</span>
         </div>
         <div className="admin-topbar__account">
+          {AI_PANEL_URL && (
+            <a
+              className="admin-button admin-button--secondary"
+              href={AI_PANEL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              AI warm mode ↗
+            </a>
+          )}
           <span className="admin-topbar__user">
             Signed in as <strong>{username}</strong>
           </span>
@@ -30,19 +36,6 @@ export default function AdminTopBar({ username, page, onLogout }: AdminTopBarPro
           </button>
         </div>
       </div>
-      {/* Plain hash links: the admin is one page with no router. */}
-      <nav className="admin-tabs" aria-label="Admin sections">
-        {PAGES.map((p) => (
-          <a
-            key={p.id}
-            href={`#${p.id}`}
-            className={`admin-tabs__tab${p.id === page ? ' admin-tabs__tab--active' : ''}`}
-            aria-current={p.id === page ? 'page' : undefined}
-          >
-            {p.label}
-          </a>
-        ))}
-      </nav>
     </header>
   )
 }

@@ -27,6 +27,10 @@ body {
 
 /* ---- Cards, buttons, fields ---- */
 
+a.admin-button {
+  text-decoration: none;
+}
+
 .admin-card {
   background: var(--brand-white);
   border: 1px solid var(--card-border);
@@ -599,233 +603,10 @@ body {
   gap: 8px;
 }
 
-/* ---- Section tabs (under the top bar) ---- */
-
-.admin-tabs {
-  display: flex;
-  gap: 4px;
-  width: 100%;
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-.admin-tabs__tab {
-  padding: 10px 14px;
-  border-bottom: 2px solid transparent;
-  color: var(--md-grey);
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.admin-tabs__tab:hover {
-  color: var(--brand-primary);
-}
-
-.admin-tabs__tab--active {
-  border-bottom-color: var(--brand-primary);
-  color: var(--brand-primary);
-  font-weight: 600;
-}
-
-/* ---- OCR warm mode ---- */
-
-.admin-badge--off {
-  background: var(--neutral-5);
-  color: var(--neutral-9);
-}
-
-.admin-warm {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.admin-warm__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.admin-warm__header .admin-card__title {
-  margin: 0;
-}
-
-.admin-warm__facts {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 12px 24px;
-  margin: 0;
-}
-
-.admin-warm__fact dt {
-  font-size: 13px;
-  color: var(--md-grey);
-}
-
-.admin-warm__fact dd {
-  margin: 2px 0 0;
-  font-weight: 500;
-  color: var(--brand-neutral-dark);
-}
-
-/* Picks which OCR version's warm mode is shown; each shows its own On/Off. */
-.admin-versions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.admin-versions__option {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 44px;
-  padding: 8px 16px;
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
-  background: var(--brand-white);
-  color: var(--brand-neutral-dark);
-  font-family: var(--font-heading);
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
-}
-
-.admin-versions__option:hover {
-  border-color: var(--brand-primary);
-}
-
-.admin-versions__option--active {
-  border-color: var(--brand-primary);
-  background: var(--brand-secondary);
-  color: var(--brand-primary);
-  font-weight: 600;
-}
-
-.admin-versions__option:focus-visible {
-  outline: 2px solid var(--brand-primary);
-  outline-offset: 2px;
-}
-
-/* The active option is the badge's own colour, so the badge goes white on it. */
-.admin-versions__option--active .admin-badge {
-  background: var(--brand-white);
-}
-
-.admin-versions__option--active .admin-badge--off {
-  background: var(--neutral-5);
-}
-
-/* The chosen version's cards, spaced like the page's own. */
-.admin-warm-version {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.admin-warm__auto-off {
-  margin-top: 12px;
-}
-
-.admin-warm__auto-off fieldset {
-  display: flex;
-  align-items: flex-end;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
-.admin-warm__auto-off .admin-field {
-  flex: 1 1 280px;
-  max-width: 420px;
-}
-
-/* The number and its unit, side by side. */
-.admin-warm__duration {
-  display: flex;
-  gap: 8px;
-}
-
-.admin-warm__duration .admin-input {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.admin-warm__duration .admin-warm__unit {
-  flex: 0 0 120px;
-  cursor: pointer;
-}
-
-/* A checkbox drawn as an on/off switch. */
-.admin-switch {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.admin-switch input {
-  position: absolute;
-  opacity: 0;
-  width: 1px;
-  height: 1px;
-}
-
-.admin-switch__track {
-  position: relative;
-  width: 44px;
-  height: 24px;
-  border-radius: 999px;
-  background: var(--neutral-5);
-  transition: background 0.15s;
-}
-
-.admin-switch__track::after {
-  content: '';
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--brand-white);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  transition: transform 0.15s;
-}
-
-.admin-switch input:checked + .admin-switch__track {
-  background: var(--brand-primary);
-}
-
-.admin-switch input:checked + .admin-switch__track::after {
-  transform: translateX(20px);
-}
-
-.admin-switch input:focus-visible + .admin-switch__track {
-  outline: 2px solid var(--brand-primary);
-  outline-offset: 2px;
-}
-
-.admin-switch input:disabled + .admin-switch__track,
-.admin-switch input:disabled ~ .admin-switch__label {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 /* ---- Small screens: the table becomes a stack of cards ---- */
 
 @media (max-width: 720px) {
   .admin-topbar__inner,
-  .admin-tabs,
   .admin-main {
     padding-left: 16px;
     padding-right: 16px;
@@ -841,6 +622,12 @@ body {
 
   .admin-topbar__user {
     font-size: 13px;
+  }
+
+  .admin-topbar__account {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
   }
 
   .admin-main {
