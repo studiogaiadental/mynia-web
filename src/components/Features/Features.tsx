@@ -1,55 +1,63 @@
+import { Fragment } from 'react'
 import './Features.css'
 
-const FEATURES = [
+type Feature = {
+  icon: string
+  title: string
+  /** Description lines; every line after the first starts on a new line on desktop only. */
+  text: string[]
+}
+
+const FEATURES: Feature[] = [
   {
     icon: 'dashboard',
     title: 'Task Dashboard',
-    text: 'Track all doctor tasks, medication schedules, and reminders in one place.',
+    text: ['Track all doctor tasks, medication schedules, and reminders in one place.'],
   },
   {
     icon: 'task',
     title: 'Health Assessment',
-    text: 'Questionnaires that create a personal risk score for heart health and diabetes.',
+    text: ['Questionnaires that create a personal risk score for heart health and diabetes.'],
   },
   {
     icon: 'audit',
     title: 'Analysis & Monitor',
-    text: 'AI-reviewed insights and trend graphs from your vitals, ECG, and lab biomarkers.',
+    text: ['AI-reviewed insights and trend graphs from your vitals, ECG, and lab biomarkers.'],
   },
   {
     icon: 'laptop-phone-sync',
     title: 'Medical Tools Link',
-    text: 'Link your ECG, monitor, stethoscope, and otoscope to your profile.',
+    text: ['Link your ECG, monitor, stethoscope, and otoscope', 'to your profile.'],
   },
   {
     icon: 'medicine-bottle',
     title: 'E-Pharmacy',
-    text: 'Order medications online with delivery, pickup, and reminders.',
+    text: ['Order medications online with delivery, pickup, and reminders.'],
   },
   {
     icon: 'news',
     title: 'Health Articles',
-    text: 'A curated library of medically reviewed articles, personalized to your health conditions.',
+    text: ['A curated library of medically reviewed articles, personalized to your health conditions.'],
   },
   {
     icon: 'video',
     title: 'Telehealth',
-    text: 'Book video, audio, or chat consultations with doctors and specialists, on demand.',
+    text: ['Book video, audio, or chat consultations with doctors and specialists, on demand.'],
   },
   {
     icon: 'calendar',
     title: 'Treatment Plans',
-    text: 'Personalized care protocols and digital prescriptions from your doctor.',
+    text: ['Personalized care protocols and digital prescriptions from your doctor.'],
   },
   {
     icon: 'clinic',
     title: 'Medical Records',
-    text: 'Lab results, imaging, and doctor reports, stored securely in one shareable timeline.',
+    text: ['Lab results, imaging, and doctor reports, stored securely in one shareable timeline.'],
   },
   {
     icon: 'gamepad',
     title: 'Health Games',
-    text: 'Health challenges, badges, and a leaderboard gamify healthy habits.',
+    text: ['Health challenges, badges, and a leaderboard gamify healthy habits.'],
   },
 ]
 
@@ -62,11 +70,23 @@ export default function Features() {
           {FEATURES.map((feature) => (
             <li className="feature-item" key={feature.title}>
               <span className="feature-item__icon">
-                <img src={`/assets/features/icon-${feature.icon}.png`} alt="" aria-hidden="true" />
+                <img src={`/assets/features/icon-${feature.icon}.svg`} alt="" aria-hidden="true" />
               </span>
               <div className="feature-item__body">
                 <h3 className="feature-item__title">{feature.title}</h3>
-                <p className="feature-item__text">{feature.text}</p>
+                <p className="feature-item__text">
+                  {feature.text.map((line, index) => (
+                    <Fragment key={index}>
+                      {index > 0 && (
+                        <>
+                          {' '}
+                          <br className="feature-item__break" />
+                        </>
+                      )}
+                      {line}
+                    </Fragment>
+                  ))}
+                </p>
               </div>
             </li>
           ))}

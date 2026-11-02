@@ -5,6 +5,7 @@ const labelDot = '/assets/care-modes/label-dot.svg'
 
 type CareMode = {
   key: string
+  /** Kept verbatim from Figma, including the double space in "FAMILY  MODE" / "COMMUNITY  MODE". */
   label: string
   title: string
   text?: string
@@ -23,14 +24,14 @@ const CARE_MODES: CareMode[] = [
   },
   {
     key: 'family',
-    label: 'Family Mode',
+    label: 'Family  Mode',
     title: 'One App for the Whole Family',
     image: '/assets/care-modes/family.jpg',
     icon: '/assets/care-modes/icon-house-heart.svg',
   },
   {
     key: 'community',
-    label: 'Community Mode',
+    label: 'Community  Mode',
     title: 'Built for Community Health Programs',
     image: '/assets/care-modes/community.jpg',
     icon: '/assets/care-modes/icon-user-group.svg',
@@ -78,14 +79,14 @@ export default function CareModes() {
 
           <div className="care-modes__callout" data-aos="fade-up">
             <div className="care-modes__callout-text">
-              <h3 className="care-modes__callout-title">Healthcare shouldn&rsquo;t feel complicated.</h3>
+              <h3 className="care-modes__callout-title">Healthcare shouldn't feel complicated.</h3>
               <p className="care-modes__callout-body">
-                Whether you&rsquo;re tracking your blood pressure, following a treatment plan,
+                Whether you're tracking your blood pressure, following a treatment plan,
                 managing a chronic condition, or caring for your family,{' '}
                 <strong>MyNia helps you stay connected to what matters most.</strong>
               </p>
             </div>
-            <ArrowButton>Explore More</ArrowButton>
+            <ArrowButton href="#health-story">Explore More</ArrowButton>
           </div>
         </div>
       </div>

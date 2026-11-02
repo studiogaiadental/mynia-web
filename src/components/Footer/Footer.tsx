@@ -2,11 +2,28 @@ import './Footer.css'
 
 const logo = '/assets/footer/logo-genia.png'
 
-const SOCIAL_LINKS = [
-  { label: 'Facebook', href: '#', icon: '/assets/footer/social-facebook.png' },
-  { label: 'Instagram', href: '#', icon: '/assets/footer/social-instagram.png' },
-  { label: 'LinkedIn', href: '#', icon: '/assets/footer/social-linkedin.png' },
-  { label: 'Twitter', href: '#', icon: '/assets/footer/social-twitter.png' },
+type SocialLink = { label: string; icon: string; href?: string }
+
+// GMedCC's own profiles, the same as the gmedcc.com footer. An entry without an href is not
+// rendered.
+const SOCIAL_LINKS: SocialLink[] = [
+  {
+    label: 'Facebook',
+    href: 'https://www.facebook.com/profile.php?id=61573723025665&locale=id_ID',
+    icon: '/assets/footer/social-facebook.svg',
+  },
+  {
+    label: 'Instagram',
+    href: 'https://www.instagram.com/gmed.cc?igsh=MWFzdXlrMWc0d3Y0YQ==',
+    icon: '/assets/footer/social-instagram.svg',
+  },
+  {
+    label: 'LinkedIn',
+    href: 'https://www.linkedin.com/company/gmedcc/about/?viewAsMember=true',
+    icon: '/assets/footer/social-linkedin.svg',
+  },
+  // Twitter/X: hidden until GMedCC supplies its profile URL (none is known; gmedcc.com has none).
+  { label: 'Twitter', icon: '/assets/footer/social-twitter.svg' },
 ]
 
 const LINK_COLUMNS = [
@@ -36,7 +53,7 @@ export default function Footer() {
   return (
     <footer className="site-footer">
       <div className="site-footer__inner">
-        <a className="site-footer__logo" href="#">
+        <a className="site-footer__logo" href="/">
           <img src={logo} alt="genia ai" width={128} height={40} />
         </a>
 
@@ -49,11 +66,13 @@ export default function Footer() {
               starting where it&rsquo;s needed most
             </p>
             <div className="site-footer__socials">
-              {SOCIAL_LINKS.map((social) => (
+              {SOCIAL_LINKS.filter((social) => social.href).map((social) => (
                 <a
                   key={social.label}
                   className="site-footer__social"
                   href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={social.label}
                 >
                   <img src={social.icon} alt="" aria-hidden="true" />
@@ -66,7 +85,10 @@ export default function Footer() {
             {LINK_COLUMNS.map((column) => (
               <div className="site-footer__column" key={column.heading}>
                 {column.headingIsLink ? (
-                  <a className="site-footer__heading site-footer__heading--link" href="#">
+                  <a
+                    className="site-footer__heading site-footer__heading--link"
+                    href="https://www.gmedcc.com/"
+                  >
                     {column.heading}
                   </a>
                 ) : (
