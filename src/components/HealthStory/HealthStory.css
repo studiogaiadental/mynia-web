@@ -1,5 +1,7 @@
 .health-story {
   background: var(--brand-white);
+  /* "Explore More" jumps here; keep the section clear of the fixed 88px header */
+  scroll-margin-top: 88px;
 }
 
 .health-story__inner {
@@ -32,6 +34,12 @@
   font-size: 40px;
   line-height: 48px;
   color: var(--brand-primary);
+}
+
+/* "in One Place" never splits: the title breaks after "All", as in the 1440 design, and in a
+   narrower column after "Story," instead, so "All" is never left alone on a line. */
+.health-story__keep {
+  white-space: nowrap;
 }
 
 .health-story__subtitle {
@@ -109,6 +117,8 @@
   white-space: nowrap;
 }
 
+/* Labels render as written (no text-transform): the main frame draws "My Focus and Task" in every
+   state; only the variant frame 13947:17047 capitalises "And". */
 .story-tab--active .story-tab__label {
   font-weight: 500;
 }
@@ -134,7 +144,7 @@
   background: #f9f9f9;
 }
 
-/* Blurred brand-secondary glows (Figma "Ellipse 2464", 834×812 with blur) */
+/* Blurred brand-secondary glows: Figma "Ellipse 2464" boxes (234×212 + 300px blur on each side = 834×812) */
 .story-card__glow {
   position: absolute;
   width: 834px;
@@ -192,6 +202,10 @@
   gap: 12px;
 }
 
+.story-card__details--wide-gap {
+  gap: 16px;
+}
+
 .story-card__text {
   font-family: var(--font-body);
   font-weight: 300;
@@ -216,7 +230,8 @@
   font-family: var(--font-body);
   font-weight: 300;
   font-size: 15px;
-  line-height: normal;
+  /* Public Sans "normal"; a number keeps the fallback glyph in "SpO₂" from making that chip taller */
+  line-height: 1.175;
   color: var(--brand-neutral-dark);
   white-space: nowrap;
 }
@@ -269,10 +284,6 @@
     gap: 32px;
   }
 
-  .health-story__break {
-    display: none;
-  }
-
   /* Tabs become a horizontal, scrollable strip above the card */
   .health-story__tabs {
     flex-direction: row;
@@ -281,6 +292,8 @@
     padding: 0 40px 4px;
     overflow-x: auto;
     scroll-snap-type: x proximity;
+    /* Without this the first pill snaps flush to the screen edge, hiding the side padding */
+    scroll-padding-inline: 40px;
     scrollbar-width: none;
   }
 
@@ -333,6 +346,7 @@
   .health-story__tabs {
     margin: 0 -24px;
     padding: 0 24px 4px;
+    scroll-padding-inline: 24px;
   }
 
   .health-story__title {

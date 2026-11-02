@@ -55,7 +55,7 @@ export default function Header() {
   return (
     <header className="site-header">
       <div className="site-header__inner">
-        <a className="site-header__logo" href="#">
+        <a className="site-header__logo" href="/">
           <img src={logo} alt="GMedCC" />
         </a>
 

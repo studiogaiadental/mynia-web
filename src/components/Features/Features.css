@@ -31,7 +31,8 @@
   margin: 0;
   padding: 0 20px;
   list-style: none;
-  border: 0.5px solid var(--neutral-5);
+  /* Figma strokes sit inside the box; an inset shadow keeps the 0.5px line out of the layout */
+  box-shadow: inset 0 0 0 0.5px var(--neutral-5);
   border-radius: var(--round-lg);
   background: var(--brand-white);
 }
@@ -149,6 +150,10 @@
 
   .feature-item__title {
     font-size: 18px;
+  }
+
+  .feature-item__break {
+    display: none;
   }
 }
 

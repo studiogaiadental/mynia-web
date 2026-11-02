@@ -2,7 +2,9 @@ import { useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import './HealthStory.css'
 
-const bgEllipse = '/assets/health-story/bg-ellipse.svg'
+// Figma's own render of the blurred "Ellipse 2464" (13947:16390) as a teal alpha mask. The SVG export's
+// feGaussianBlur draws wider, paler and with ring banding in browsers, so the raster render is used instead.
+const bgGlow = '/assets/health-story/bg-glow.png'
 
 type Tab = {
   label: string
@@ -11,6 +13,8 @@ type Tab = {
   tags: string[]
   phone: string
   phoneAlt: string
+  /** The default (Health Assessments) frame puts 16px between text and tags; the other four states use 12px */
+  wideTagGap?: boolean
 }
 
 const TABS: Tab[] = [
@@ -21,6 +25,7 @@ const TABS: Tab[] = [
     tags: ['Cardiovascular', 'Diabetes', 'Skin', 'Cancer', 'Lifestyle'],
     phone: '/assets/health-story/phone-assessments.png',
     phoneAlt: 'MyNia life stage questionnaire with baseline health score',
+    wideTagGap: true,
   },
   {
     label: 'Measurement',
@@ -105,13 +110,12 @@ export default function HealthStory() {
   }
 
   return (
-    <section className="health-story">
+    <section className="health-story" id="health-story">
       <div className="health-story__inner">
         <div className="health-story__intro">
           <header className="health-story__header" data-aos="fade-up">
             <h2 className="health-story__title">
-              Your Health Story, All <br className="health-story__break" />
-              in One Place
+              Your Health Story, All <span className="health-story__keep">in One Place</span>
             </h2>
             <p className="health-story__subtitle">
               Designed for individuals, families, and community health programs.
@@ -161,10 +165,10 @@ export default function HealthStory() {
           data-aos="fade-left"
         >
           <div className="story-card__media">
-            <img className="story-card__glow story-card__glow--top" src={bgEllipse} alt="" aria-hidden="true" />
-            <img className="story-card__glow story-card__glow--top" src={bgEllipse} alt="" aria-hidden="true" />
-            <img className="story-card__glow story-card__glow--left" src={bgEllipse} alt="" aria-hidden="true" />
-            <img className="story-card__glow story-card__glow--left-2" src={bgEllipse} alt="" aria-hidden="true" />
+            <img className="story-card__glow story-card__glow--top" src={bgGlow} alt="" aria-hidden="true" />
+            <img className="story-card__glow story-card__glow--top" src={bgGlow} alt="" aria-hidden="true" />
+            <img className="story-card__glow story-card__glow--left" src={bgGlow} alt="" aria-hidden="true" />
+            <img className="story-card__glow story-card__glow--left-2" src={bgGlow} alt="" aria-hidden="true" />
             <img
               key={activeTab.phone}
               className="story-card__phone"
@@ -174,7 +178,9 @@ export default function HealthStory() {
           </div>
           <div className="story-card__body" key={activeTab.label}>
             <h3 className="story-card__title">{activeTab.title}</h3>
-            <div className="story-card__details">
+            <div
+              className={`story-card__details${activeTab.wideTagGap ? ' story-card__details--wide-gap' : ''}`}
+            >
               <p className="story-card__text">{activeTab.text}</p>
               <ul className="story-card__tags">
                 {activeTab.tags.map((tag) => (

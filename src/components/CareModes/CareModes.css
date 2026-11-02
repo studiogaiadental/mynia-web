@@ -145,6 +145,11 @@
   height: 20px;
 }
 
+/* Figma keeps a double space in "FAMILY  MODE" / "COMMUNITY  MODE" */
+.mode-card__label span {
+  white-space: pre;
+}
+
 .mode-card__title {
   margin: 0;
   font-family: var(--font-heading);
@@ -171,7 +176,8 @@
   justify-content: space-between;
   gap: 24px;
   padding: 24.5px;
-  border: 0.5px solid var(--neutral-5);
+  /* Figma strokes sit inside the box; an inset shadow keeps the 0.5px line out of the layout */
+  box-shadow: inset 0 0 0 0.5px var(--neutral-5);
   border-radius: var(--round-lg);
   background: var(--brand-white);
 }

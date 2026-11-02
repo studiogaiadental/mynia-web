@@ -1,11 +1,12 @@
 import './OfflineCapability.css'
 
 const phoneHand = '/assets/offline/phone-hand.png'
+const ellipse = '/assets/offline/ellipse.svg'
 
 const POINTS = [
-  { icon: '/assets/offline/icon-archive.png', text: 'Manage health records anytime, anywhere' },
-  { icon: '/assets/offline/icon-gauge.png', text: 'Log measurements without interruption' },
-  { icon: '/assets/offline/icon-offline.png', text: 'Uninterrupted offline & online availability' },
+  { icon: '/assets/offline/icon-archive.svg', text: 'Manage health records anytime, anywhere' },
+  { icon: '/assets/offline/icon-gauge.svg', text: 'Log measurements without interruption' },
+  { icon: '/assets/offline/icon-offline.svg', text: 'Uninterrupted offline & online availability' },
 ]
 
 export default function OfflineCapability() {
@@ -21,16 +22,8 @@ export default function OfflineCapability() {
         </header>
 
         <div className="offline__stage">
-          {/* Figma "Ellipse 1": 4px stroke in brand-secondary, fading out towards the left */}
-          <svg className="offline__ellipse" viewBox="0 0 902 902" aria-hidden="true">
-            <defs>
-              <linearGradient id="offline-arc" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0.83" stopColor="#afdadb" stopOpacity="0" />
-                <stop offset="1" stopColor="#afdadb" stopOpacity="0.39" />
-              </linearGradient>
-            </defs>
-            <circle cx="451" cy="451" r="449" fill="none" stroke="url(#offline-arc)" strokeWidth="4" />
-          </svg>
+          {/* Figma "Ellipse 1": the arc behind the phone that the three points follow */}
+          <img className="offline__ellipse" src={ellipse} alt="" aria-hidden="true" width={902} height={902} />
           <img
             className="offline__phone"
             src={phoneHand}

@@ -84,6 +84,12 @@
   color: #000;
 }
 
+/* "seamless experience." never splits: the line breaks before it, as in the 1440 design, at
+   any column width, so no word is left alone on the line above it. */
+.hero__keep {
+  white-space: nowrap;
+}
+
 .hero__visual {
   position: relative;
   flex-shrink: 0;
@@ -136,10 +142,6 @@
 
   .hero__description {
     font-size: 20px;
-  }
-
-  .hero__break {
-    display: none;
   }
 
   .hero__visual {

@@ -1,0 +1,10 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="902" height="902" viewBox="0 0 902 902" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path id="Ellipse 1" opacity="0.8" d="M900 451C900 698.976 698.976 900 451 900C203.024 900 2 698.976 2 451C2 203.024 203.024 2 451 2C698.976 2 900 203.024 900 451Z" stroke-width="4" stroke="url(#paint0_linear_0_11)"/>
+<defs>
+<linearGradient id="paint0_linear_0_11" x1="451" y1="83.0571" x2="451" y2="818.528" gradientUnits="userSpaceOnUse">
+<stop stop-color="#AFDADB" stop-opacity="0"/>
+<stop offset="0.5" stop-color="#AFDADB" stop-opacity="0.5"/>
+<stop offset="1" stop-color="#AFDADB" stop-opacity="0"/>
+</linearGradient>
+</defs>
+</svg>

@@ -5,10 +5,13 @@ import CareModes from './components/CareModes/CareModes'
 import HealthStory from './components/HealthStory/HealthStory'
 import OfflineCapability from './components/OfflineCapability/OfflineCapability'
 import Features from './components/Features/Features'
-// import Testimonials from './components/Testimonials/Testimonials'
+import Testimonials from './components/Testimonials/Testimonials'
 import Cta from './components/Cta/Cta'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
+
+// Off until real, consented testimonials replace the placeholder quotes in Testimonials.tsx.
+const SHOW_TESTIMONIALS = false
 
 export default function App() {
   useEffect(() => {
@@ -26,7 +29,7 @@ export default function App() {
       <HealthStory />
       <OfflineCapability />
       <Features />
-      {/* <Testimonials /> */}
+      {SHOW_TESTIMONIALS && <Testimonials />}
       <Cta />
     </SiteLayout>
   )

@@ -26,8 +26,7 @@ export default function Hero() {
             <p className="hero__description">
               A patient-centric digital ecosystem designed to integrate medical devices, AI
               diagnostics, telehealth, treatment planning, and health management tools into one{' '}
-              <br className="hero__break" />
-              seamless experience.
+              <span className="hero__keep">seamless experience.</span>
             </p>
           </div>
           <ArrowButton href={APK_DOWNLOAD_URL}>Download Now</ArrowButton>

@@ -44,6 +44,12 @@ body {
   padding: 0;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 body {
   background: var(--brand-white);
   overflow-x: hidden;

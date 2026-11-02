@@ -38,6 +38,8 @@
   justify-content: center;
   flex-wrap: wrap;
   gap: 29px;
+  /* Figma "Navigation Bar": the links sit centred in a 618px-wide bar */
+  width: 618px;
   min-width: 0;
 }
 
@@ -138,6 +140,10 @@
     padding: 0 64px;
     justify-content: space-between;
     gap: 24px;
+  }
+
+  .site-header__nav {
+    width: auto;
   }
 }
 
